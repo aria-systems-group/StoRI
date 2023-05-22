@@ -8,6 +8,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # find my packages hopefully
 find_package(ompl REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 14)
@@ -24,10 +25,13 @@ add_executable(STL_RRT main.cpp)
 # add directories to list of paths to search for include filesa
 target_include_directories(STL_RRT PRIVATE
 ${OMPL_INCLUDE_DIRS} 
+${Boost_INCLUDE_DIRS}
 ${PROJECT_SOURCE_DIR}/stl_rrt_planner
 ${PROJECT_SOURCE_DIR}/PrSTL_Monitor
 ${PROJECT_SOURCE_DIR}/Spaces
 )
+
+MESSAGE(STATUS "** OMPL Libraries: ${OMPL_LIBRARIES}")
 
 # link the libraries
 target_link_libraries(STL_RRT
@@ -37,6 +41,3 @@ stlrrt
 prstl
 matState
 )
-
-
-
