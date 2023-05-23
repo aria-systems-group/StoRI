@@ -8,62 +8,60 @@
 
 class ASTNode {
     public:
-    	//general info
-        int CLindex;
-        int CRindex;
+      //general info
+        ASTNode* left;
+        ASTNode* right;
         int nodetype; //1 for "and", 2 for "not", 3 for "until", 4 for "true", 5 for linear predicate (leaf node), 6 for "globally", 7 for "eventually"
 
-        //for temporal operators
+      //for temporal operators
         double leftbound; //left time bound
         double rightbound; //right time bound
 
-        //for predicates - predicate is satisfied when Ax - B > 0 
+      //for predicates - predicate is satisfied when Ax - B > 0 
         Eigen::MatrixXd A; 
         float B; 
 
-        ASTNode(int leftchildindex, int rightchildindex, int node_type, double lefttime, double righttime, Eigen::MatrixXd Avec, float Bcon) // constructor
+      //constructor
+        ASTNode(int node_type) 
         {
-        	CLindex = leftchildindex;
-        	CRindex = rightchildindex;
         	nodetype = node_type;
-
-        	leftbound = lefttime;
-        	rightbound = righttime;
-
-        	A = Avec;
-        	B = Bcon;
+          left = NULL;
+          right = NULL;
         }
-
 };
 
 class PrSTL_Monitor
 {
     public:
         //Attributes
-        std::vector<ASTNode> Mytree;
+        ASTNode* myRootNode;
 
         std::map<int,std::vector<int>> heuristicInfo;
 
         std::vector<std::vector<double>> simpleHeuristicInfo;
 
         //Methods
-        void BuildForm1(std::vector<ASTNode> *Mytree); //Function hardcodes a formula for now
+        void BuildForm1(); //build formula 1 from paper
 
-        void BuildForm2(std::vector<ASTNode> *Mytree); //Function hardcodes a formula for now
+        void BuildForm2(); //build formula 2 from paper
 
-        void BuildForm3(std::vector<ASTNode> *Mytree); //Function hardcodes a formula for now
+        void BuildForm3(); //build formula 3 from paper
 
-        void BuildForm4(std::vector<ASTNode> *Mytree); //Function hardcodes a formula for now
+        void BuildForm4(); //build formula 4 from paper
+
+        void BuildAST(std::string strFormula);
 
         bool HyperplaneCCValidityChecker(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const;
 
         double HyperplaneProbabilityFinder(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const;
 
-        void AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, int nodeind, bool CompleteTrace);
+        void internalStoRI(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, ASTNode* myNode, bool CompleteTrace);
+
+        void AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, bool CompleteTrace);
 
         bool isActive(double time, int nodeind);
 
-        void CollectPredicates(int nodeind, std::vector<Eigen::MatrixXd> *A, std::vector<double> *b);
+        ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode> predicates);
 
     //NOTE TO SELF: make constructor later. 
     //have it take in a tree and a state space dimension 

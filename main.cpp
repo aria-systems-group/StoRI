@@ -320,13 +320,13 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
     roplan.setprintsoln(true); //if true, prints final solution's interval to output and CSV
     PrSTL_Monitor MyMonitor; //Initial monitor
     if (formula == 1) {//which (hardcoded) formula to solve for
-        MyMonitor.BuildForm1(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm1(); 
     }else if (formula == 2) {
-        MyMonitor.BuildForm2(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm2(); 
     }else if (formula == 3) {
-        MyMonitor.BuildForm3(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm3(); 
     }else if (formula == 4) {
-        MyMonitor.BuildForm4(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm4(); 
     }
     roplan.optimizeSolution(optimize);
     roplan.setStoRIMonitor(MyMonitor); //give that monitor to the planner
@@ -459,7 +459,7 @@ void evaluateMatlabTrace()
 
     //evaluate the trace
     PrSTL_Monitor MyMonitor;
-    MyMonitor.BuildForm1(&MyMonitor.Mytree);
+    MyMonitor.BuildForm1();
     double Interval[2];
 
     // std::vector<double> temptime;
@@ -479,7 +479,7 @@ void evaluateMatlabTrace()
         // tempmean.push_back(meanTrace[i]);
         // tempcov.push_back(covtrace[i]);
 
-        MyMonitor.AriaMetric(&temptime, &tempmean, &tempcov, Interval, 0, false);
+        MyMonitor.AriaMetric(&temptime, &tempmean, &tempcov, Interval, false);
 
         std::cout << "Interval at time " << timevec[i] << ": [" << Interval[0] << ", " << Interval[1] << "] \n";
 
@@ -488,7 +488,7 @@ void evaluateMatlabTrace()
         tempcov.clear();
     }
 
-    MyMonitor.AriaMetric(&timevec, &meanTrace, &covtrace, Interval, 0, true);
+    MyMonitor.AriaMetric(&timevec, &meanTrace, &covtrace, Interval, true);
 
     std::cout << "\n\n\n FINAL INTERVAL IS: [" << Interval[0] << ", " << Interval[1] << "] " << std::endl;
 
@@ -520,9 +520,11 @@ int main(int argc, char ** argv)
     // bool benchmark = true;
     // bool optimize = false;
 
-    planWithSimpleSetup(formula,benchmark,optimize);
+    // planWithSimpleSetup(formula,benchmark,optimize);
 
     // evaluateMatlabTrace();
+
+    std::cout << "testing hello?\n";
 
     return 0;
 }

@@ -3,480 +3,188 @@
 #include <vector>
 #include "PrSTL_Monitor.h"
 #include <map>
+#include <cassert>
 
 //TODO - something is off by a timestep or two, somewhere (look at online monitoring examples)
-//TODO - make readme elaborating "allowed" operators
-//TODO - chek formulas
+//TODO - replace "buildform" functions by simply doing it live in main
 
 //long term todos:
 // - make parser
 // - make branch - identifier 
 // - make reach-conjunction-tree identifier 
 
-void PrSTL_Monitor::BuildForm1(std::vector<ASTNode> *Mytree)
+
+void PrSTL_Monitor::BuildForm1()
 {
-    //ARGUMENTS IN CONSTRUCTOR ARE LEFT IND, RIGHT IND, TYPE, LB, RB, A, B
-    //1 for "and", 2 for "not", 3 for "until", 4 for "true", 5 for predicate (leaf node), 6 for "globally", 7 for "eventually"
-    //iota is zero if formula is x GREATER than value, or one if x LESS than value
-
-    //create all the nodes
-    ASTNode Rootnode(1,15,3,0,6,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(Rootnode);
-
-    ASTNode node1(2,9,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node1);
-
-    ASTNode node2(3,6,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node2);
-
-    ASTNode node3(4,5,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node3);
-
-    ASTNode node4(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-    Mytree->push_back(node4);
-
-    ASTNode node5(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-4); // x < 4
-    Mytree->push_back(node5);
-
-    ASTNode node6(7,8,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node6);
-
-    ASTNode node7(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-3); // y<3
-    Mytree->push_back(node7);
-
-    ASTNode node8(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),0); //y>0
-    Mytree->push_back(node8);
-
-    ASTNode node9(10,10,2,0,6,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node9);
-
-    ASTNode node10(11,14,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node10);
-
-    ASTNode node11(12,13,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node11);
-
-    ASTNode node12(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),1); // x>1
-    Mytree->push_back(node12);
-
-    ASTNode node13(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-2); // x < 2
-    Mytree->push_back(node13);
-
-    ASTNode node14(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),2); // y > 2
-    Mytree->push_back(node14);
-
-    ASTNode node15(16,17,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node15);
-
-    ASTNode node16(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),3); // x>3
-    Mytree->push_back(node16);
-
-    ASTNode node17(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),2); // y > 2
-    Mytree->push_back(node17);
-
-    heuristicInfo.insert(std::pair<int,std::vector<int>>(1,{2}));
-    simpleHeuristicInfo.push_back({3.5,2.5});
+  this->myRootNode = new ASTNode(1);
 }
 
-void PrSTL_Monitor::BuildForm2(std::vector<ASTNode> *Mytree)
+void PrSTL_Monitor::BuildForm2()
 {
-    //ARGUMENTS IN CONSTRUCTOR ARE LEFT IND, RIGHT IND, TYPE, LB, RB, A, B
-    //1 for "and", 2 for "not", 3 for "until", 4 for "true", 5 for predicate (leaf node), 6 for "globally", 7 for "eventually"
-    //iota is zero if formula is x GREATER than value, or one if x LESS than value
-
-    //create all the nodes
-    ASTNode Rootnode(1,23,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(Rootnode);
-
-    ASTNode node1(2,18,3,0,10,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node1);
-
-    ASTNode node2(3,10,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node2);
-
-    ASTNode node3(4,7,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node3);
-
-    ASTNode node4(5,6,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node4);
-
-    ASTNode node5(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-    Mytree->push_back(node5);
-
-    ASTNode node6(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-4); // x < 4
-    Mytree->push_back(node6);
-
-    ASTNode node7(8,9,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node7);
-
-    ASTNode node8(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),-2); //y > -2
-    Mytree->push_back(node8);
-
-    ASTNode node9(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-2); // y < 2
-    Mytree->push_back(node9);
-
-    ASTNode node10(11,11,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node10);
-
-    ASTNode node11(12,15,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node11);
-
-    ASTNode node12(13,14,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node12);
-
-    ASTNode node13(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),-0.5); //y > -0.5
-    Mytree->push_back(node13);
-
-    ASTNode node14(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-0.5); // y < 0.5
-    Mytree->push_back(node14);
-
-    ASTNode node15(16,17,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node15);
-
-    ASTNode node16(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),1.5); //x > 1.5
-    Mytree->push_back(node16);
-
-    ASTNode node17(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-3.5); //x < 3.5
-    Mytree->push_back(node17);
-
-    ASTNode node18(19,22,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node18);
-
-    ASTNode node19(20,21,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node19);
-
-    ASTNode node20(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),2); //x > 2
-    Mytree->push_back(node20);
-
-    ASTNode node21(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-3); // x < 3
-    Mytree->push_back(node21);
-
-    ASTNode node22(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),1); //y > 1
-    Mytree->push_back(node22);
-
-    ASTNode node23(2,24,3,0,10,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node23);
-
-    ASTNode node24(25,28,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node24);
-
-    ASTNode node25(26,27,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node25);
-
-    ASTNode node26(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),2); //x > 2
-    Mytree->push_back(node26);
-
-    ASTNode node27(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-3); // x < 3
-    Mytree->push_back(node27);
-
-    ASTNode node28(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),1); //y < -1
-    Mytree->push_back(node28);
-
-    heuristicInfo.insert(std::pair<int,std::vector<int>>(2,{4}));
-    heuristicInfo.insert(std::pair<int,std::vector<int>>(3,{11}));
-
-    simpleHeuristicInfo.push_back({2.5,1.5});
-    simpleHeuristicInfo.push_back({2.5,-1.5});
+  this->myRootNode = new ASTNode(1);
 }
 
-void PrSTL_Monitor::BuildForm3(std::vector<ASTNode> *Mytree)
+void PrSTL_Monitor::BuildForm3()
 {
-    //ARGUMENTS IN CONSTRUCTOR ARE LEFT IND, RIGHT IND, TYPE, LB, RB, A, B
-    //1 for "and", 2 for "not", 3 for "until", 4 for "true", 5 for predicate (leaf node), 6 for "globally", 7 for "eventually"
-    //iota is zero if formula is x GREATER than value, or one if x LESS than value
-
-    //create all the nodes
-    ASTNode Rootnode(1,14,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(Rootnode);
-
-    ASTNode node1(2,9,3,0,5,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node1);
-
-    ASTNode node2(3,6,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node2);
-
-    ASTNode node3(4,5,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node3);
-
-    ASTNode node4(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-    Mytree->push_back(node4);
-
-    ASTNode node5(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-5); // x < 5
-    Mytree->push_back(node5);
-
-    ASTNode node6(7,8,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node6);
-
-    ASTNode node7(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),0); //y > 0
-    Mytree->push_back(node7);
-
-    ASTNode node8(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-3); // y< 3
-    Mytree->push_back(node8);
-
-    ASTNode node9(10,13,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node9);
-
-    ASTNode node10(11,12,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node10);
-
-    ASTNode node11(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),1); //y > 1
-    Mytree->push_back(node11);
-
-    ASTNode node12(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-2); // y< 2
-    Mytree->push_back(node12);
-
-    ASTNode node13(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-1); // x < 1
-    Mytree->push_back(node13);
-
-    ASTNode node14(15,15,6,0,5,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node14);
-
-    ASTNode node15(16,16,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node15);
-
-    ASTNode node16(9,17,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node16);
-
-    ASTNode node17(18,18,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node17);
-
-    ASTNode node18(19,26,3,0,10,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node18);
-
-    ASTNode node19(2,20,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node19);
-
-    ASTNode node20(21,21,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node20);
-
-    ASTNode node21(22,25,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node21);
-
-    ASTNode node22(23,24,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node22);
-
-    ASTNode node23(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),1); //x > 1
-    Mytree->push_back(node23);
-
-    ASTNode node24(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-4); // x < 4
-    Mytree->push_back(node24);
-
-    ASTNode node25(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),1); // y > 1
-    Mytree->push_back(node25);
-
-    ASTNode node26(27,28,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node26);
-
-    ASTNode node27(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),4); // x > 4
-    Mytree->push_back(node27);
-
-    ASTNode node28(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-1); //y < 1
-    Mytree->push_back(node28);
-
-    heuristicInfo.insert(std::pair<int,std::vector<int>>(2,{4}));
-    heuristicInfo.insert(std::pair<int,std::vector<int>>(3,{11}));
-
-    simpleHeuristicInfo.push_back({0.5,1.5});
-    simpleHeuristicInfo.push_back({4.5,0.5});
+  this->myRootNode = new ASTNode(1);
 }
 
-// void PrSTL_Monitor::BuildForm4(std::vector<ASTNode> *Mytree)
-// {
-//     //ARGUMENTS IN CONSTRUCTOR ARE LEFT IND, RIGHT IND, TYPE, LB, RB, A, B
-//     //1 for "and", 2 for "not", 3 for "until", 4 for "true", 5 for predicate (leaf node), 6 for "globally", 7 for "eventually"
-//     //iota is zero if formula is x GREATER than value, or one if x LESS than value
-
-//     //create all the nodes
-//     ASTNode Rootnode(1,27,3,0,10,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(Rootnode);
-
-//     ASTNode node1(2,9,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node1);
-
-//     ASTNode node2(3,6,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node2);
-
-//     ASTNode node3(4,5,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node3);
-
-//     ASTNode node4(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-//     Mytree->push_back(node4);
-
-//     ASTNode node5(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-3); // x < 3
-//     Mytree->push_back(node5);
-
-//     ASTNode node6(7,8,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node6);
-
-//     ASTNode node7(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),0); //y > 0
-//     Mytree->push_back(node7);
-
-//     ASTNode node8(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-5); // y < 5
-//     Mytree->push_back(node8);
-
-//     ASTNode node9(10,10,2,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node9);
-
-//     ASTNode node10(11,18,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node10);
-
-//     ASTNode node11(12,15,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node11);
-
-//     ASTNode node12(13,14,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node12);
-
-//     ASTNode node13(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-//     Mytree->push_back(node13);
-
-//     ASTNode node14(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-2.5); // x < 2.5
-//     Mytree->push_back(node14);
-
-//     ASTNode node15(16,17,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node15);
-
-//     ASTNode node16(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),2); //y > 2
-//     Mytree->push_back(node16);
-
-//     ASTNode node17(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-3); // y < 3
-//     Mytree->push_back(node17);
-
-//     ASTNode node18(19,19,2,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node18);
-
-//     ASTNode node19(20,20,7,0,3,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node19);
-
-//     ASTNode node20(21,24,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node20);
-
-//     ASTNode node21(22,23,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node21);
-
-//     ASTNode node22(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-//     Mytree->push_back(node22);
-
-//     ASTNode node23(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-1); // x < 1
-//     Mytree->push_back(node23);
-
-//     ASTNode node24(25,26,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node24);
-
-//     ASTNode node25(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),4); //y > 4
-//     Mytree->push_back(node25);
-
-//     ASTNode node26(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-5); // y < 5
-//     Mytree->push_back(node26);
-
-//     ASTNode node27(28,31,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node27);
-
-//     ASTNode node28(29,30,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node28);
-
-//     ASTNode node29(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),2); //x > 2
-//     Mytree->push_back(node29);
-
-//     ASTNode node30(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-2.5); // x < 2.5
-//     Mytree->push_back(node30);
-
-//     ASTNode node31(32,33,1,0,0,Eigen::ArrayXd::Zero(3),0);
-//     Mytree->push_back(node31);
-
-//     ASTNode node32(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),4); //y > 4
-//     Mytree->push_back(node32);
-
-//     ASTNode node33(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-5); // y < 5
-//     Mytree->push_back(node33);
-
-//     simpleHeuristicInfo.push_back({2.5,4.5});
-//     simpleHeuristicInfo.push_back({1.5,3.5});
-// }
-
-void PrSTL_Monitor::BuildForm4(std::vector<ASTNode> *Mytree)
+void PrSTL_Monitor::BuildForm4()
 {
-    //ARGUMENTS IN CONSTRUCTOR ARE LEFT IND, RIGHT IND, TYPE, LB, RB, A, B
-    //1 for "and", 2 for "not", 3 for "until", 4 for "true", 5 for predicate (leaf node), 6 for "globally", 7 for "eventually"
-    //iota is zero if formula is x GREATER than value, or one if x LESS than value
+  this->myRootNode = new ASTNode(1);
+}
 
-    //create all the nodes
-    ASTNode Rootnode(1,19,3,0,10,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(Rootnode);
+ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
+{
+  // TODO
+    // - create predicate class
+      // Define "atomic predicates" as an inherited class of ASTNode w/ two arguments, A and b. Have them create a map/dictionary from the string to the predicate
+    // - make the AST smarter w/ BST THIS IS, LIKE, A CRUCIAL FIRST STEP
+    // make parser resilient to spaces 
+    // make parser return an error for "non-binarized" data
+  
+  // REQUIREMENTS/RESTRINCTIONS
+  // - Gaussianity, of course
+  // - Linear predicates, of course
+  // - Must define predicates before formula
+  // - Must be diligent w/ parenthesis
+    // can TRY to account for this via errors
+  // - Must "write with binary tree interpretation in mind"
+    // can TRY to account for this via errors
+  // - No unbounded formulae
+    // can give error if no time bounds given
+  // - No disjunctions or implications (conjunctions and negations!)
+    // can TRY to account for this via errors
+  // - Must follow standard for temporal operators and their time bounds
 
-    ASTNode node1(2,9,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node1);
+  // if it's a predicate
+  if (predicates.count(strFormula)>0) 
+  {
+    return predicates[strFormula]; 
+  } 
 
-    ASTNode node2(3,6,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node2);
+  // if it's negation
+  else if (strFormula[0] == '!') 
+  {
+    // create new negation node
+    ASTNode* myNode = new ASTNode(2);  
 
-    ASTNode node3(4,5,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node3);
+    //parse remaining tree as child node
+    myNode->left = BuildAST(strFormula.substr(1), predicates); 
 
-    ASTNode node4(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),0); //x > 0
-    Mytree->push_back(node4);
+    //return the node
+    return myNode;
+  }
 
-    ASTNode node5(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-3); // x < 3
-    Mytree->push_back(node5);
+  // if it's eventually or globally
+  else if (strFormula[0] == 'F' || strFormula[0] == 'G') 
+  {
+    // create node
+    ASTNode* myNode;
+    if (strFormula[0] == 'F')
+    {
+      myNode = new ASTNode(7);
+    }else {
+      myNode = new ASTNode(6);
+    }
 
-    ASTNode node6(7,8,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node6);
+    //Identify Time Bounds
+    assert(("Temporal Operators must be followed by bracketed time bounds, Ex: F[0,2]",strFormula[1] == '[')); 
+    int charIndex = strFormula.find(','); //find comma
+    assert(("Temporal Operators cannot be unbounded, must separate time bounds with a comma, Ex: F[0,2]",charIndex != std::string::npos));
+    std::string leftString = strFormula.substr(2,(charIndex)); //split string at comma
+    std::string rightString = strFormula.substr(charIndex+1);
+    myNode->leftbound = std::stod(leftString); //save left temporal bound
+    charIndex = rightString.find(']'); //find right bracket
+    assert(("Must close interval with a right bracket, Ex: F[0,2]",charIndex != std::string::npos));
+    leftString = rightString.substr(0,(charIndex)); //split string at bracket
+    rightString = rightString.substr(charIndex+1); 
+    myNode->rightbound = std::stod(leftString); //save right temporal bound
+                                                //
+    //parse remaining tree as child node
+    myNode->left = BuildAST(rightString, predicates); 
 
-    ASTNode node7(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),0); //y > 0
-    Mytree->push_back(node7);
+    //return the node
+    return myNode;
+  }
 
-    ASTNode node8(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-5); // y < 5
-    Mytree->push_back(node8);
+  // if it's a parenthesis oof
+  else if (strFormula[0] == '(')
+  {
+    //iterate through string, looking for a "parenthetical chunk"
+    int myCounter = 0;
+    int index = 0;
+    do
+    {
+      assert(("Parenthetical mismatch, check parenthesis",index < (strFormula.length()-1))); //if we reach the end of the string (and index is not zero)
+      if (strFormula.at(index)=='(') 
+      {
+        myCounter;  
+      }
+      else if (strFormula.at(index)==')') {
+        myCounter++;
+      }
+      index++;
+    } while(myCounter != 0);
 
-    ASTNode node9(10,10,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node9);
+    // if string is empty, remove parenthesis from front and back and feed it to the function again
+    if (index == (strFormula.length()-1))
+    {
+      return BuildAST(strFormula.substr(1,(strFormula.length()-1)), predicates); 
+    } 
+    
+    // otherwisre, split into left and right side of symbol using index we kept
+    std::string leftString = strFormula.substr(0,index);
+    std::string rightString = strFormula.substr(index+1);
+    
+    // ensure that the operator is not disjuction
+    assert(("Disjunction is no good, please use conjucntion. i.e., A|B = !(!A&!B)",strFormula.at(index)!='|')); // check for disjunction
 
-    ASTNode node10(11,16,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node10);
+    // if operator is conjunction
+    if (strFormula.at(index)=='&') 
+    {
+      ASTNode* myNode = new ASTNode(1);  
+      myNode->left = BuildAST(leftString, predicates); 
+      myNode->right = BuildAST(rightString, predicates); 
+    } 
 
-    ASTNode node11(12,15,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node11);
+    // else if operator is until
+    else if (strFormula.at(index)=='U') 
+    {
+      
+      // create the node, find the left child info
+      ASTNode* myNode = new ASTNode(3);  
 
-    ASTNode node12(13,14,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node12);
+      myNode->left = BuildAST(leftString, predicates); 
 
-    ASTNode node13(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),2); //y > 2
-    Mytree->push_back(node13);
+      strFormula = rightString;
 
-    ASTNode node14(-1,-1,5,0,0,Eigen::Vector4d(0,0,-1,0),-3); // y < 3
-    Mytree->push_back(node14);
+      //identify time bounds
+      assert(("temporal operators must be followed by bracketed time bounds, ex: f[0,2]",strFormula[0] == '[')); 
+      int charindex = strFormula.find(','); //find comma
+      assert(("temporal operators cannot be unbounded, must separate time bounds with a comma, ex: f[0,2]",charindex != std::string::npos));
+      std::string leftstring = strFormula.substr(1,(charindex)); //split string at comma
+      std::string rightstring = strFormula.substr(charindex+1);
+      myNode->leftbound = std::stod(leftstring); //save left temporal bound
+      charindex = rightstring.find(']'); //find right bracket
+      assert(("must close interval with a right bracket, ex: f[0,2]",charindex != std::string::npos));
+      leftstring = rightstring.substr(0,(charindex)); //split string at bracket
+      rightstring = rightstring.substr(charindex+1); 
+      myNode->rightbound = std::stod(leftstring); //save right temporal bound
 
-    ASTNode node15(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-2.5); // x < 2.5
-    Mytree->push_back(node15);
+      //parse remaining tree as child node
+      myNode->right = BuildAST(rightstring, predicates); 
 
-    ASTNode node16(17,17,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node16);
+      //return the node
+      return myNode;
+    }
+  } 
 
-    ASTNode node17(18,22,3,0,3,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node17);
-
-    ASTNode node18(19,19,2,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node18);
-
-    ASTNode node19(20,21,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node19);
-
-    ASTNode node20(-1,-1,5,0,0,Eigen::Vector4d(1,0,0,0),2); //x > 2
-    Mytree->push_back(node20);
-
-    ASTNode node21(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),4); //y > 4
-    Mytree->push_back(node21);
-
-    ASTNode node22(23,24,1,0,0,Eigen::ArrayXd::Zero(3),0);
-    Mytree->push_back(node22);
-
-    ASTNode node23(-1,-1,5,0,0,Eigen::Vector4d(-1,0,0,0),-1); //x < 1
-    Mytree->push_back(node23);
-
-    ASTNode node24(-1,-1,5,0,0,Eigen::Vector4d(0,0,1,0),4); //y > 4
-    Mytree->push_back(node24);
-
-    simpleHeuristicInfo.push_back({2.5,4.5});
-    simpleHeuristicInfo.push_back({0.5,4.5});
+  // else, assert general error
+  else 
+  {
+    assert(("error, something went wrong, say something about link to docs or tips" == 0));
+  }
 }
 
 bool PrSTL_Monitor::HyperplaneCCValidityChecker(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const 
@@ -536,26 +244,26 @@ double PrSTL_Monitor::HyperplaneProbabilityFinder(const Eigen::MatrixXd &A, cons
     return (1 - delta); //P(satisfaction) = 1 - P(violation) 
 }
 
-void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, int nodeind, bool CompleteTrace)
+void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, ASTNode* myNode, bool CompleteTrace)
 {
     //NOTE: "until" is not coded up yet!! quite ugly ha ha
-    if (this->Mytree[nodeind].nodetype==4) { //"True" Node
+    if (myNode->nodetype==4) { //"True" Node
         Interval[0]= 1;
         Interval[1] = 1;
     }
-    if (this->Mytree[nodeind].nodetype==5) { //Predicate Node
-        double prob = this->HyperplaneProbabilityFinder(this->Mytree[nodeind].A,this->Mytree[nodeind].B, (*meanTrace)[0], (*covtrace)[0]);
+    if (myNode->nodetype==5) { //Predicate Node
+        double prob = this->HyperplaneProbabilityFinder(myNode->A,myNode->B, (*meanTrace)[0], (*covtrace)[0]);
         Interval[0] = prob;
         Interval[1] = prob;
     }
-    if (this->Mytree[nodeind].nodetype==1) { //Conjunction
+    if (myNode->nodetype==1) { //Conjunction
         // create intervals for the children
         double intervalL[2];
         double intervalR[2];
 
         // calculate intervals for the children
-        this->AriaMetric(timevec,meanTrace,covtrace,intervalL,this->Mytree[nodeind].CLindex, CompleteTrace); 
-        this->AriaMetric(timevec,meanTrace,covtrace,intervalR,this->Mytree[nodeind].CRindex, CompleteTrace); 
+        this->internalStoRI(timevec,meanTrace,covtrace,intervalL,myNode->left, CompleteTrace); 
+        this->internalStoRI(timevec,meanTrace,covtrace,intervalR,myNode->right, CompleteTrace); 
 
         //Apply Rules
         Interval[0] = intervalL[0] + intervalR[0] - 1; //lower bound
@@ -566,29 +274,23 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
 
         if (intervalL[1] < intervalR[1]) { //upperbound is left upper bound if it's smaller
         Interval[1] = intervalL[1];
-        ////DELETE this print stuff
-        //std::cout << "At node " << nodeind << ", Conjunction with nodes " << this->Mytree[nodeind].CLindex << " and " << this->Mytree[nodeind].CRindex << std::endl;
-        //std::cout << "Interval is: [" << Interval[0] << ", " << Interval[1] << "] \n\n";
         return;
         }
         Interval[1] = intervalR[1]; //otherwise, it's right upper bound
 
-        ////DELETE this print stuff
-        //std::cout << "At node " << nodeind << ", Conjunction with nodes " << this->Mytree[nodeind].CLindex << " and " << this->Mytree[nodeind].CRindex << std::endl;
-        //std::cout << "Interval is: [" << Interval[0] << ", " << Interval[1] << "] \n\n";
     }
-    if (this->Mytree[nodeind].nodetype==2) { //Negation
+    if (myNode->nodetype==2) { //Negation
         // create an interval for the child
         double interval_child[2];
 
         // calculate the interval for the child
-        this->AriaMetric(timevec,meanTrace,covtrace,interval_child,this->Mytree[nodeind].CLindex, CompleteTrace); 
+        this->internalStoRI(timevec,meanTrace,covtrace,interval_child,myNode->left, CompleteTrace); 
 
         // Apply Rules
         Interval[0] = 1 - interval_child[1];
         Interval[1] = 1 - interval_child[0];
     }
-    if (this->Mytree[nodeind].nodetype==6) { //Globally
+    if (myNode->nodetype==6) { //Globally
         //Initialize stuff
         double interval_child[2];
         Interval[0] = 1;
@@ -596,7 +298,7 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
         bool updated = false;
 
         for (int i = 0; i < timevec->size(); i++) { //for each time in the trace
-            if (Mytree[nodeind].leftbound <= (*timevec)[i] && (*timevec)[i] <= Mytree[nodeind].rightbound) { //if the time is in the bounds of the operator
+            if (myNode->leftbound <= (*timevec)[i] && (*timevec)[i] <= myNode->rightbound) { //if the time is in the bounds of the operator
                 updated = true; //report that we had data
                 //Preprocess traces
                 std::vector<double> time_adj(timevec->begin()+i, timevec->end()); //start with "current" element for all traces
@@ -611,20 +313,20 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
 
                 //TESTING - delete these later
                 // std::cout << "\n\n\nCurrent time of exampination is: " << (*timevec)[i] << std::endl;
-                // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, 19, CompleteTrace); 
+                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 19, CompleteTrace); 
                 // std::cout << "Interval at node 19 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, 20, CompleteTrace); 
+                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 20, CompleteTrace); 
                 // std::cout << "Interval at node 29 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, 21, CompleteTrace); 
+                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 21, CompleteTrace); 
                 // std::cout << "Interval at node 21 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, 28, CompleteTrace); 
+                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 28, CompleteTrace); 
                 // std::cout << "Interval at node 28 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, 29, CompleteTrace); 
+                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 29, CompleteTrace); 
                 // std::cout << "Interval at node 29 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
                 //std::cout << "And the state is " << mean_adj[0] << "\n outside of the lower level calls\n";
                 
                 //calculate interval of child node
-                this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, this->Mytree[nodeind].CLindex, CompleteTrace); 
+                this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, myNode->left, CompleteTrace); 
                 
                 //update bounds
                 if (interval_child[0] < Interval[0]) { //update lower bound 
@@ -640,11 +342,11 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
         if (!updated) { //report zero probability of success if we have no data in the time interval
         Interval[0] = 0;
         Interval[1] = 1;
-        } else if ((timevec->back() < this->Mytree[nodeind].rightbound)) { //Report Lower bound of zero if there was data, but it's not finished yet
+        } else if ((timevec->back() < myNode->rightbound)) { //Report Lower bound of zero if there was data, but it's not finished yet
         Interval[0] = 0; 
         } 
     }
-    if (this->Mytree[nodeind].nodetype==7) { //Eventually
+    if (myNode->nodetype==7) { //Eventually
         //Initialize stuff
         double interval_child[2];
         Interval[0] = 0;
@@ -653,7 +355,7 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
 
         for (int i = 0; i < timevec->size(); i++) { //for each time in the trace
             double deletethis = (*timevec)[i];
-            if (Mytree[nodeind].leftbound <= (*timevec)[i] && (*timevec)[i] <= Mytree[nodeind].rightbound) { //if the time is in the bounds of the operator
+            if (myNode->leftbound <= (*timevec)[i] && (*timevec)[i] <= myNode->rightbound) { //if the time is in the bounds of the operator
                 updated = true;
                 //Preprocess traces
                 std::vector<double> time_adj(timevec->begin()+i, timevec->end()); //start with "current" element for all traces
@@ -670,7 +372,7 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
                 }
                 
                 //calculate interval of child node
-                this->AriaMetric(&time_adj, &mean_adj, &cov_adj, interval_child, this->Mytree[nodeind].CLindex, CompleteTrace);
+                this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, myNode->left, CompleteTrace);
 
                 // std::cout << "time = " << (*timevec)[i] << std::endl;
                 // std::cout << "Interval = [" << interval_child[0] << ", " << interval_child[1] << "] " << std::endl;  
@@ -689,11 +391,11 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
         if (!updated) { //report zero probability of success if we have no data in the time interval
         Interval[0] = 0;
         Interval[1] = 1;
-        } else if ((timevec->back() < this->Mytree[nodeind].rightbound) & !CompleteTrace) { //Report upper bound of one if there was data, but it's not finished yet
+        } else if ((timevec->back() < myNode->rightbound) & !CompleteTrace) { //Report upper bound of one if there was data, but it's not finished yet
         Interval[1] = 1; //NOTE ON THIS CURRENT IMPLEMENTATION: This means that the trace must have more data than the time horizon to be considered "complete"
         }
     }
-    if (this->Mytree[nodeind].nodetype==3) { //Until
+    if (myNode->nodetype==3) { //Until
         //Initialize stuff
         double leftinterval[2];
         double rightinterval[2];
@@ -721,13 +423,13 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
             }
 
             //DELETE!
-            // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, leftinterval, 11, true); 
+            // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, leftinterval, 11, true); 
             // std::cout << "\n\n Interval of 'trigger' region: [" << leftinterval[0] << ", " << leftinterval[1] << "]\n";
-            // this->AriaMetric(&time_adj, &mean_adj, &cov_adj, leftinterval, 19, true); 
+            // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, leftinterval, 19, true); 
             // std::cout << "Interval of 'eventually' node: [" << leftinterval[0] << ", " << leftinterval[1] << "]\n";
 
             //calculate interval of left child node
-            this->AriaMetric(&time_adj, &mean_adj, &cov_adj, leftinterval, this->Mytree[nodeind].CLindex, CompleteTrace); // debug: is 'completetrace' true??
+            this->internalStoRI(&time_adj, &mean_adj, &cov_adj, leftinterval, myNode->left, CompleteTrace); // debug: is 'completetrace' true??
             // std::cout << "time: " << timeval<<std::endl;
             //update values for "globally/left" side
             if (leftinterval[0] < globint[0]) {
@@ -740,10 +442,10 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
             // std::cout << "globally portion: [" << globint[0] << ", " << globint[1] << "\n";
 
             //calc function of satisfying temporal thingy at that time (right branch)
-            if (Mytree[nodeind].leftbound <= (*timevec)[i] && (*timevec)[i] <= Mytree[nodeind].rightbound) { //if the time is in the bounds of the operator
+            if (myNode->leftbound <= (*timevec)[i] && (*timevec)[i] <= myNode->rightbound) { //if the time is in the bounds of the operator
                 //calculate interval of right child node
-                this->AriaMetric(&time_adj, &mean_adj, &cov_adj, rightinterval, this->Mytree[nodeind].CRindex, CompleteTrace);
-            }else if ((*timevec)[i] < Mytree[nodeind].leftbound){ //if time is less than lower bound
+                this->internalStoRI(&time_adj, &mean_adj, &cov_adj, rightinterval, myNode->right, CompleteTrace);
+            }else if ((*timevec)[i] < myNode->leftbound){ //if time is less than lower bound
                 rightinterval[0] = 0;
                 rightinterval[1] = 0; //debug: check logic here
             }else { //time is greater than upper bound
@@ -767,7 +469,7 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
             }
         }
 
-        if ((timevec->back() < this->Mytree[nodeind].rightbound) & !CompleteTrace) { //Report upper bound of one if there was data, but it's not finished yet
+        if ((timevec->back() < myNode->rightbound) & !CompleteTrace) { //Report upper bound of one if there was data, but it's not finished yet
             // std::cout << "time: " << timevec->back() << std::endl;
             // std::cout << "globint: [" << globint[0] << ", " << globint[1] << "] \n";
             // std::cout << "rightint: [" << rightinterval[0] << ", " << rightinterval[1] << "] \n";
@@ -783,36 +485,7 @@ void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::
     }
 }
 
-bool PrSTL_Monitor::isActive(double time, int nodeind)
+void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, bool CompleteTrace)
 {
-    //todo: fix this if we add eventually conditions
-    if ((this->Mytree[nodeind].nodetype == 6) || (this->Mytree[nodeind].nodetype == 7)) { //if temporal
-        if ((time > this->Mytree[nodeind].rightbound) || (time > this->Mytree[nodeind].rightbound)) { // if time is outside of bounds
-            return false;
-        }
-        return true;
-    }else if ((this->Mytree[nodeind].nodetype == 5) || (this->Mytree[nodeind].nodetype == 4)) { //if predicate or truth 
-        return true;
-    }else if (this->Mytree[nodeind].nodetype == 1){ // conjunction
-        bool leftbranch = this->isActive(time, this->Mytree[nodeind].CLindex);
-        bool rightbranch = this->isActive(time, this->Mytree[nodeind].CRindex);
-        if(leftbranch || rightbranch) {
-            return true;
-        }
-        return false;
-    }else { //everything else (negation)
-        return this->isActive(time, this->Mytree[nodeind].CLindex);
-    }
-}
-
-void PrSTL_Monitor::CollectPredicates(int nodeind, std::vector<Eigen::MatrixXd> *A, std::vector<double> *b)
-{
-    //YO this assumes it's being fed a CONJUNCTION TREE, so only nodes are conjunction and predicate
-    if (this->Mytree[nodeind].nodetype == 5) { //predicate
-        (*A).push_back(this->Mytree[nodeind].A);
-        (*b).push_back(this->Mytree[nodeind].B);
-    } else { //conjunction
-        this->CollectPredicates(this->Mytree[nodeind].CLindex, A, b);
-        this->CollectPredicates(this->Mytree[nodeind].CRindex, A, b);
-    }
+  this->internalStoRI(timevec,meanTrace,covtrace,Interval,this->myRootNode, CompleteTrace); 
 }

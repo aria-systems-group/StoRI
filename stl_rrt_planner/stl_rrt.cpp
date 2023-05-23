@@ -203,7 +203,7 @@ ompl::base::PlannerStatus ompl::control::STLRRT::solve(const base::PlannerTermin
             if (solv)
             {
                 // find interval of solution
-                MyMonitor_.AriaMetric(&motion->Motion_TimeSignal, &motion->Motion_StateSignal, &motion->Motion_CovSignal, resultcontainer_, 0, true); 
+                MyMonitor_.AriaMetric(&motion->Motion_TimeSignal, &motion->Motion_StateSignal, &motion->Motion_CovSignal, resultcontainer_, true); 
 
                 // save as first score if one hasn't been found yet
                 if (FirstScore_ == 0) {
@@ -480,7 +480,7 @@ bool ompl::control::STLRRT::isSignalValid(Motion *candidate, bool isfinished)
 {
     //Define interval, calculate StoRI (partial or complete depending on isfinished)
     double Interval[2];
-    MyMonitor_.AriaMetric(&candidate->Motion_TimeSignal, &candidate->Motion_StateSignal, &candidate->Motion_CovSignal, Interval, 0, isfinished); 
+    MyMonitor_.AriaMetric(&candidate->Motion_TimeSignal, &candidate->Motion_StateSignal, &candidate->Motion_CovSignal, Interval, isfinished); 
 
     if (!isfinished && (Interval[1] > StoRIConstraint_)) {
         //std::cout << "Partial Interval of [" << Interval[0] << ", " << Interval[1] << "] \n";
