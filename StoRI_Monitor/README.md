@@ -89,4 +89,6 @@ Then, the portion $\text{Puddle}\rightarrow(\lnot \text{Charger}U_{[0,3]}\text{C
 > mymap["safety"] = safety;
 
 Finally, this lets the user write the formula as $\text{safety}U_{[0,10]}\text{Charger}$:
-> ASTNode* mySpecification = myMonitor.BuildAST("((workspace)&(safety))U[0,10](charger)",mymap);
+> myMonitor.myRootNode = myMonitor.BuildAST("((workspace)&(safety))U[0,10](charger)",mymap);
+
+This formula is provided in the source code using function `BuildForm3()`
