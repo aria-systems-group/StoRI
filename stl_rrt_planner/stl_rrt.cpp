@@ -39,7 +39,7 @@
 #include "ompl/tools/config/SelfConfig.h"
 #include <limits>
 #include <iostream>
-#include "PrSTL_Monitor.h"
+#include "StoRI_Monitor.h"
 #include "R2BeliefSpace.h" //todo: remove the need for explicit decalring statespace types in this script
 #include <ompl/base/spaces/TimeStateSpace.h>
 
