@@ -13,6 +13,7 @@ find_package(Boost REQUIRED)
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE Debug)
 
 # add my libraries (extra functions)
 add_subdirectory(stl_rrt_planner)
@@ -30,8 +31,6 @@ ${PROJECT_SOURCE_DIR}/stl_rrt_planner
 ${PROJECT_SOURCE_DIR}/PrSTL_Monitor
 ${PROJECT_SOURCE_DIR}/Spaces
 )
-
-MESSAGE(STATUS "** OMPL Libraries: ${OMPL_LIBRARIES}")
 
 # link the libraries
 target_link_libraries(STL_RRT

@@ -170,7 +170,6 @@ ompl::base::PlannerStatus ompl::control::STLRRT::solve(const base::PlannerTermin
         if (rng_.uniform01() <= goalBias_) { // simple heuristic
             //randomly select goal
             int selectedgoal = rng_.uniformInt(0, (MyMonitor_.simpleHeuristicInfo.size()-1)); //randomly pick a "goal"
-            
             rstate->as<ompl::base::CompoundStateSpace::StateType>()->as<R2BeliefSpace::StateType>(0)->values[0] = MyMonitor_.simpleHeuristicInfo[selectedgoal][0];
             rstate->as<ompl::base::CompoundStateSpace::StateType>()->as<R2BeliefSpace::StateType>(0)->values[2] = MyMonitor_.simpleHeuristicInfo[selectedgoal][1];
         } 
@@ -336,7 +335,7 @@ ompl::base::PlannerStatus ompl::control::STLRRT::solve(const base::PlannerTermin
         //ss.getSolutionPath().printAsMatrix(myfile);
         myfile.close();
 
-        std::cout << "TESTING PATH LENGTH: " << calcPathLength(solution) << std::endl;
+        // std::cout << "TESTING PATH LENGTH: " << calcPathLength(solution) << std::endl;
 
         if (printsoln_) {
             //resultcontainer should containt best solution so far
@@ -373,7 +372,6 @@ void ompl::control::STLRRT::getPlannerData(base::PlannerData &data) const
 
     if (lastGoalMotion_)
         data.addGoalVertex(base::PlannerDataVertex(lastGoalMotion_->state));
-
     for (auto m : motions)
     {
         if (m->parent)

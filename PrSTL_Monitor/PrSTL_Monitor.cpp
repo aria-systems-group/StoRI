@@ -17,22 +17,146 @@
 
 void PrSTL_Monitor::BuildForm1()
 {
-  this->myRootNode = new ASTNode(1);
+  // initialize predicate dict
+  std::map<std::string,
+  ASTNode*> mymap;
+
+  mymap["x>3"] = axisAlignedPredicate(4, 0, true, 3);
+  mymap["x<4"] = axisAlignedPredicate(4, 0, false, 4);
+  mymap["y>2"] = axisAlignedPredicate(4, 2, true, 2);
+  mymap["y<3"] = axisAlignedPredicate(4, 2, false, 3);
+  mymap["x>1"] = axisAlignedPredicate(4, 0, true, 1);
+  mymap["x<2"] = axisAlignedPredicate(4, 0, false, 2);
+  mymap["x>0"] = axisAlignedPredicate(4, 0, true, 0);
+  mymap["y>0"] = axisAlignedPredicate(4, 2, true, 0);
+
+  //build regions
+  ASTNode* goal = this->BuildAST("((x>3)&(x<4))&((y>2)&(y<3))",mymap);
+  mymap["goal"] = goal;
+
+  ASTNode* obstacle = this->BuildAST("((x>1)&(x<2))&((y>2)&(y<3))",mymap);
+  mymap["obstacle"] = obstacle;
+
+  ASTNode* workspace = this->BuildAST("((x>0)&(x<4))&((y>0)&(y<3))",mymap);
+  mymap["workspace"] = workspace;
+
+  //build specification
+  this->myRootNode = this->BuildAST("((!(obstacle))&(workspace))U[4,6](goal)",mymap);
+
+  //optionaly (goofy) heuristic info
+  heuristicInfo.insert(std::pair<int,std::vector<int>>(1,{2}));
+  simpleHeuristicInfo.push_back({3.5,2.5});
 }
 
 void PrSTL_Monitor::BuildForm2()
 {
-  this->myRootNode = new ASTNode(1);
+  // initialize predicate dict
+  std::map<std::string,
+  ASTNode*> mymap;
+
+  // build predicates
+  mymap["x>0"] = axisAlignedPredicate(4, 0, true, 0);
+  mymap["x<4"] = axisAlignedPredicate(4, 0, false, 4);
+  mymap["y>-2"] = axisAlignedPredicate(4, 2, true, -2);
+  mymap["y<2"] = axisAlignedPredicate(4, 2, false, 2);
+  mymap["x>1.5"] = axisAlignedPredicate(4, 0, true, 1.5);
+  mymap["x<3.5"] = axisAlignedPredicate(4, 0, false, 3.5);
+  mymap["y>-0.5"] = axisAlignedPredicate(4, 2, true, -0.5);
+  mymap["y<0.5"] = axisAlignedPredicate(4, 2, false, 0.5);
+  mymap["x>2"] = axisAlignedPredicate(4, 0, true, 2);
+  mymap["x<3"] = axisAlignedPredicate(4, 0, false, 3);
+  mymap["y>1"] = axisAlignedPredicate(4, 2, true, 1);
+  mymap["y<-1"] = axisAlignedPredicate(4, 2, false, -1);
+
+  //build regions
+  ASTNode* goal1 = this->BuildAST("((x>2)&(x<3))&(y>1)",mymap);
+  mymap["goal1"] = goal1;
+
+  ASTNode* goal2 = this->BuildAST("((x>2)&(x<3))&(y<-1)",mymap);
+  mymap["goal2"] = goal2;
+
+  ASTNode* obstacle = this->BuildAST("((x>1.5)&(x<3.5))&((y>-0.5)&(y<0.5))",mymap);
+  mymap["obstacle"] = obstacle;
+
+  ASTNode* workspace = this->BuildAST("((x>0)&(x<4))&((y>-2)&(y<2))",mymap);
+  mymap["workspace"] = workspace;
+
+  //build specification
+  this->myRootNode = this->BuildAST("(((workspace)&(!(obstacle)))U[0,10](goal1))&(((workspace)&(!(obstacle)))U[0,10](goal2))",mymap);
+
+  //optionaly (goofy) heuristic info
+  heuristicInfo.insert(std::pair<int,std::vector<int>>(2,{4}));
+  heuristicInfo.insert(std::pair<int,std::vector<int>>(3,{11}));
+
+  simpleHeuristicInfo.push_back({2.5,1.5});
+  simpleHeuristicInfo.push_back({2.5,-1.5});
 }
 
 void PrSTL_Monitor::BuildForm3()
 {
-  this->myRootNode = new ASTNode(1);
+  // initialize predicate dict
+  std::map<std::string,
+  ASTNode*> mymap;
+
+  // build predicates
+  mymap["x>0"] = axisAlignedPredicate(4, 0, true, 0);
+  mymap["x<3"] = axisAlignedPredicate(4, 0, false, 3);
+  mymap["y>0"] = axisAlignedPredicate(4, 2, true, 0);
+  mymap["y<5"] = axisAlignedPredicate(4, 2, false, 5);
+  mymap["y>2"] = axisAlignedPredicate(4, 2, true, 2);
+  mymap["y<3"] = axisAlignedPredicate(4, 2, false, 3);
+  mymap["x<2.5"] = axisAlignedPredicate(4, 0, false, 2.5);
+  mymap["y>4"] = axisAlignedPredicate(4, 2, true, 4);
+  mymap["x<1"] = axisAlignedPredicate(4, 0, false, 1);
+  mymap["x>2"] = axisAlignedPredicate(4, 0, true, 2);
+
+  //build regions
+  ASTNode* puddle = this->BuildAST("((y>2)&(y<3))&(x<2.5)",mymap);
+  mymap["puddle"] = puddle;
+
+  ASTNode* charger = this->BuildAST("(x>2)&(y>4)",mymap);
+  mymap["charger"] = charger;
+
+  ASTNode* carpet = this->BuildAST("(x<1)&(y>4)",mymap);
+  mymap["carpet"] = carpet;
+
+  ASTNode* workspace = this->BuildAST("((x>0)&(x<3))&((y>0)&(y<5))",mymap);
+  mymap["workspace"] = workspace;
+
+  //build subspecifications
+    //Puddle -> (!charge U carpet)
+    // = !Puddle OR (!charge U carpet) 
+    // = !(Puddle AND !(!charge U carpet))
+  ASTNode* dryOffFirst = this->BuildAST("(!(charger))U[0,3](carpet)",mymap);
+  mymap["dryOffFirst"] = dryOffFirst;
+
+  ASTNode* safety = this->BuildAST("!((puddle)&(!(dryOffFirst)))",mymap);
+  mymap["safety"] = safety;
+
+  //build specification
+  this->myRootNode = this->BuildAST("((workspace)&(safety))U[0,10](charger)",mymap);
+
+  //optionaly (goofy) heuristic info
+  simpleHeuristicInfo.push_back({2.5,4.5});
+  simpleHeuristicInfo.push_back({0.5,4.5});
 }
 
-void PrSTL_Monitor::BuildForm4()
+ASTNode* PrSTL_Monitor::axisAlignedPredicate(int stateDim, int index, bool geq, double Bval)
 {
-  this->myRootNode = new ASTNode(1);
+  //stateDim = dimension of state
+  //index = index (zero-based) of state of interest
+  //geq = true if "greater than or equal to", false if "less than or equal to"
+  //Bval = value state mus be less than or equal to
+  ASTNode* myNode = new ASTNode(5);
+  myNode->A = Eigen::VectorXd::Zero(stateDim);
+  if (geq) {
+    myNode->A(index) = 1;
+    myNode->B = Bval;
+  }else {
+    myNode->A(index) = -1;
+    myNode->B = -1*Bval;
+  }
+  return myNode;
 }
 
 ASTNode* PrSTL_Monitor::BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
@@ -61,13 +185,6 @@ ASTNode* PrSTL_Monitor::BuildAST(std::string strFormula, std::map<std::string,AS
   // if it's a predicate
   if (predicates.count(strFormula)>0) 
   {
-    // std::cout<<"found that it's a predicate\n";
-    // std::cout<<"key: \n";
-    // std::cout<<strFormula<<std::endl;
-    // std::cout<< "address of node that corresponds to this key: \n";
-    // std::cout<< predicates[strFormula] << std::endl;
-    // std::cout<< "B that corresponds to that node: \n";
-    // std::cout<<predicates[strFormula]->B << std::endl;
     return predicates[strFormula]; 
   } 
 
@@ -258,7 +375,6 @@ double PrSTL_Monitor::HyperplaneProbabilityFinder(const Eigen::MatrixXd &A, cons
 
 void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, ASTNode* myNode, bool CompleteTrace)
 {
-    //NOTE: "until" is not coded up yet!! quite ugly ha ha
     if (myNode->nodetype==4) { //"True" Node
         Interval[0]= 1;
         Interval[1] = 1;

@@ -211,11 +211,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
         bounds.setHigh(2,2);
     }else if (formula == 3) {
         bounds.setLow(0,0); //x position bounds
-        bounds.setHigh(0,5);
-        bounds.setLow(2,0); //y position bounds
-        bounds.setHigh(2,3);
-    }else if (formula == 4) {
-        bounds.setLow(0,0); //x position bounds
         bounds.setHigh(0,3);
         bounds.setLow(2,0); //y position bounds
         bounds.setHigh(2,5);
@@ -265,11 +260,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
         start[2] = 1.5;
         start[3] = 0;
     }else if (formula == 3) {
-        start[0] = 2.5;
-        start[1] = -0.1;
-        start[2] = 2.5;
-        start[3] = 0;
-    }else if (formula == 4) {
         start[0] = 1.5;
         start[1] = 0.5;
         start[2] = 1;
@@ -325,8 +315,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
         MyMonitor.BuildForm2(); 
     }else if (formula == 3) {
         MyMonitor.BuildForm3(); 
-    }else if (formula == 4) {
-        MyMonitor.BuildForm4(); 
     }
     roplan.optimizeSolution(optimize);
     roplan.setStoRIMonitor(MyMonitor); //give that monitor to the planner
@@ -347,8 +335,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
             str1 = "Formula2";
         }else if (formula == 3) {
             str1 = "Formula3";
-        }else if (formula == 4) {
-            str1 = "Formula4";
         }
 
         if (optimize) {
@@ -384,7 +370,7 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
     }
     
     if (!benchmark) {
-        ob::PlannerStatus solved = ss.solve(300);
+        ob::PlannerStatus solved = ss.solve(60);
 
         if (solved)
         {
@@ -516,58 +502,9 @@ int main(int argc, char ** argv)
         benchmark = std::stoi(argv[3]);
     }
 
-    // int formula = 1;
-    // bool benchmark = true;
-    // bool optimize = false;
-
-    // planWithSimpleSetup(formula,benchmark,optimize);
+    planWithSimpleSetup(formula,benchmark,optimize);
 
     // evaluateMatlabTrace();
-
-    // build predicates
-    std::map<std::string,ASTNode*> mymap;
-
-    PrSTL_Monitor myMonitor; //Initial monitor
-
-    ASTNode* firstNode = new ASTNode(5);
-    firstNode->A = Eigen::Vector4d(1,0,0,0);
-    firstNode->B = 3;
-    mymap["x>3"] = firstNode;
-
-    ASTNode* secondNode = new ASTNode(5);
-    secondNode->A = Eigen::Vector4d(-1,0,0,0);
-    secondNode->B = -4;
-    mymap["x<4"] = secondNode;
-    
-    ASTNode* thirdNode = new ASTNode(5);
-    thirdNode->A = Eigen::Vector4d(0,0,1,0);
-    thirdNode->B = 2;
-    mymap["y>2"] = thirdNode;
-
-    ASTNode* fourthNode = new ASTNode(5);
-    fourthNode->A = Eigen::Vector4d(0,0,-1,0);
-    fourthNode->B = -3;
-    mymap["y<3"] = fourthNode;
-
-    ASTNode* fifthNode = new ASTNode(5);
-    fifthNode->A = Eigen::Vector4d(1,0,0,0);
-    fifthNode->B = 1;
-    mymap["x>1"] = fifthNode;
-
-    ASTNode* sixthNode = new ASTNode(5);
-    sixthNode->A = Eigen::Vector4d(-1,0,0,0);
-    sixthNode->B = -2;
-    mymap["x<2"] = sixthNode;
-
-    //build regions
-    ASTNode* goal = myMonitor.BuildAST("((x>3)&(x<4))&((y>2)&(y<3))",mymap);
-    mymap["goal"] = goal;
-
-    ASTNode* obstacle = myMonitor.BuildAST("((x>1)&(x<2))&((y>2)&(y<3))",mymap);
-    mymap["obstacle"] = obstacle;
-
-    //build specification
-    ASTNode* testformula = myMonitor.BuildAST("(!(obstacle))U[4,6](goal)",mymap);
 
     return 0;
 }
