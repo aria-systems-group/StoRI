@@ -62,9 +62,4 @@ class PrSTL_Monitor
         bool isActive(double time, int nodeind);
 
         ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode> predicates);
-
-    //NOTE TO SELF: make constructor later. 
-    //have it take in a tree and a state space dimension 
-    //eventually, replace tree with formula and create parser method
 };
-

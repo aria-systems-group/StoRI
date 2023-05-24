@@ -1,5 +1,4 @@
 // ROLAND ILYES
-
 #include <memory>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
@@ -387,102 +386,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
         
 }
 
-void evaluateMatlabTrace()
-{
-    //initialize vectors
-    std::vector<double> timevec;
-    std::vector<Eigen::MatrixXd> meanTrace;
-    std::vector<Eigen::MatrixXd> covtrace;
-    std::vector<double> meanvec;
-    std::vector<double> covvec;
-
-    //load in the data from csv
-    std::ifstream myfile1;
-    std::ofstream myfile;
-    myfile1.open ("/Users/rolandilyes/PrSTL_Monitor/src/build/Matlab_path_data.csv");
-    std::string line;
-    std::string numb;
-
-    int ind_1 = 0;
-    int ind_2 = 0;
-    float test;
-    std::string record;
-    while (std::getline(myfile1, record)){
-        std::istringstream line(record);
-        while (std::getline(line,record, ',')){
-            //first, sort elements to temporary vectors
-            if (ind_2 == 0) { //if first element, save to time vector
-            timevec.push_back(std::stod(record));
-            } else if (ind_2 > 0 & ind_2 < 5) { //next four elements are mean
-            meanvec.push_back(std::stod(record));
-            } else { //rest are covariance
-            covvec.push_back(std::stod(record));
-            }
-
-            //iterate counter
-            ind_2++;
-        }
-
-        //next, add Eigen Matrices to the global traces
-        meanTrace.push_back(Eigen::Vector4d(meanvec[0],meanvec[1],meanvec[2],meanvec[3]));
-        auto cov = new Eigen::Matrix4d;
-        (*cov) << covvec[0], covvec[1], covvec[2], covvec[3],
-                  covvec[1], covvec[4], covvec[5], covvec[6],
-                  covvec[2], covvec[5], covvec[7], covvec[8],
-                  covvec[3], covvec[6], covvec[8], covvec[9];
-        covtrace.push_back((*cov));
-        delete cov;
-
-        //clear temporary vectors
-        meanvec.clear();
-        covvec.clear();
-        
-        ind_2 = 0;
-        ind_1++;
-    }
-
-    myfile1.close();
-
-    //evaluate the trace
-    PrSTL_Monitor MyMonitor;
-    MyMonitor.BuildForm1();
-    double Interval[2];
-
-    // std::vector<double> temptime;
-    // std::vector<Eigen::MatrixXd> tempmean;
-    // std::vector<Eigen::MatrixXd> tempcov;
-    for (int i = 0; i < timevec.size(); i++) {
-        auto temptime = timevec;
-        temptime.resize(i);
-
-        auto tempmean = meanTrace;
-        tempmean.resize(i);
-
-        auto tempcov = covtrace;
-        tempcov.resize(i);
-
-        // temptime.push_back(timevec[i]);
-        // tempmean.push_back(meanTrace[i]);
-        // tempcov.push_back(covtrace[i]);
-
-        MyMonitor.AriaMetric(&temptime, &tempmean, &tempcov, Interval, false);
-
-        std::cout << "Interval at time " << timevec[i] << ": [" << Interval[0] << ", " << Interval[1] << "] \n";
-
-        temptime.clear();
-        tempmean.clear();
-        tempcov.clear();
-    }
-
-    MyMonitor.AriaMetric(&timevec, &meanTrace, &covtrace, Interval, true);
-
-    std::cout << "\n\n\n FINAL INTERVAL IS: [" << Interval[0] << ", " << Interval[1] << "] " << std::endl;
-
-    myfile.open("Interval.csv");
-    myfile << Interval[0] << ", " << Interval[1] << std::endl;
-    myfile.close();
-}
-
 int main(int argc, char ** argv)
 {
     int formula = std::stoi(argv[1]);
@@ -503,8 +406,6 @@ int main(int argc, char ** argv)
     }
 
     planWithSimpleSetup(formula,benchmark,optimize);
-
-    // evaluateMatlabTrace();
 
     return 0;
 }

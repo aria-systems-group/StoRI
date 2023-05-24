@@ -5,15 +5,9 @@
 #include <map>
 #include <cassert>
 
-//TODO - something is off by a timestep or two, somewhere (look at online monitoring examples)
-//TODO - replace "buildform" functions by simply doing it live in main
-//TODO - in StoRI calculations, add check if a node has children or not and add errors where helpful
-
-//long term todos:
-// - make parser
-// - make branch - identifier 
-// - make reach-conjunction-tree identifier 
-
+// TODO - something is off by a timestep or so, somewhere (look at online monitoring examples)
+// TODO - in StoRI calculations, add check if a node has children or not and add errors where helpful
+// TODO - make parser return an error for "non-binarized" data
 
 void PrSTL_Monitor::BuildForm1()
 {
@@ -161,26 +155,18 @@ ASTNode* PrSTL_Monitor::axisAlignedPredicate(int stateDim, int index, bool geq, 
 
 ASTNode* PrSTL_Monitor::BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
 {
-  // TODO
-    // - create predicate class
-      // Define "atomic predicates" as an inherited class of ASTNode w/ two arguments, A and b. Have them create a map/dictionary from the string to the predicate
-    // - make the AST smarter w/ BST THIS IS, LIKE, A CRUCIAL FIRST STEP
-    // make parser resilient to spaces 
-    // make parser return an error for "non-binarized" data
-  
   // REQUIREMENTS/RESTRINCTIONS
   // - Gaussianity, of course
   // - Linear predicates, of course
   // - Must define predicates before formula
   // - Must be diligent w/ parenthesis
-    // can TRY to account for this via errors
   // - Must "write with binary tree interpretation in mind"
-    // can TRY to account for this via errors
   // - No unbounded formulae
-    // can give error if no time bounds given
   // - No disjunctions or implications (conjunctions and negations!)
-    // can TRY to account for this via errors
   // - Must follow standard for temporal operators and their time bounds
+   
+  // remove spaces from string
+  remove(strFormula.begin(), strFormula.end(), ' ');
 
   // if it's a predicate
   if (predicates.count(strFormula)>0) 
@@ -439,20 +425,6 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
                 time_adj[j] -= timeval;
                 }
 
-                //TESTING - delete these later
-                // std::cout << "\n\n\nCurrent time of exampination is: " << (*timevec)[i] << std::endl;
-                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 19, CompleteTrace); 
-                // std::cout << "Interval at node 19 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 20, CompleteTrace); 
-                // std::cout << "Interval at node 29 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 21, CompleteTrace); 
-                // std::cout << "Interval at node 21 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 28, CompleteTrace); 
-                // std::cout << "Interval at node 28 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, 29, CompleteTrace); 
-                // std::cout << "Interval at node 29 is: [" << interval_child[0] << ", " << interval_child[1] << "] \n";
-                //std::cout << "And the state is " << mean_adj[0] << "\n outside of the lower level calls\n";
-                
                 //calculate interval of child node
                 this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, myNode->left, CompleteTrace); 
                 
@@ -491,19 +463,13 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
                 std::vector<Eigen::MatrixXd> cov_adj(covtrace->begin()+i, covtrace->end());
 
                 //subtract current time value from entire time vector (allows for handling of nested temporal operators)
-                //std::cout << "NEW ROOT TIMESTEP!!!" << std::endl;
                 double timeval = time_adj[0];
                 for (int j = 0; j < time_adj.size(); j++) {
-                //std::cout << "\n\nTime Before: " << time_adj[j] << std::endl;
                 time_adj[j] -= timeval;
-                //std::cout << "Time After: " << time_adj[j] << std::endl;
                 }
                 
                 //calculate interval of child node
                 this->internalStoRI(&time_adj, &mean_adj, &cov_adj, interval_child, myNode->left, CompleteTrace);
-
-                // std::cout << "time = " << (*timevec)[i] << std::endl;
-                // std::cout << "Interval = [" << interval_child[0] << ", " << interval_child[1] << "] " << std::endl;  
 
                 //update bounds
                 if (interval_child[0] > Interval[0]) { //update lower bound 
@@ -534,8 +500,6 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
         Interval[1] = 0;
         bool updated = false;
 
-        // std::cout << "\n\nNEW CALL\n";
-
         for (int i = 0; i < timevec->size(); i++) { //for each time in the trace
             //Preprocess traces
             std::vector<double> time_adj(timevec->begin()+i, timevec->end()); //start with "current" element for all traces
@@ -545,20 +509,11 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
             double timeval = time_adj[0];
             //subtract current time value from entire time vector (allows for handling of nested temporal operators)
             for (int j = 0; j < time_adj.size(); j++) {
-                //std::cout << "\n\nTime Before: " << time_adj[j] << std::endl;
                 time_adj[j] -= timeval;
-                //std::cout << "Time After: " << time_adj[j] << std::endl;
             }
-
-            //DELETE!
-            // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, leftinterval, 11, true); 
-            // std::cout << "\n\n Interval of 'trigger' region: [" << leftinterval[0] << ", " << leftinterval[1] << "]\n";
-            // this->internalStoRI(&time_adj, &mean_adj, &cov_adj, leftinterval, 19, true); 
-            // std::cout << "Interval of 'eventually' node: [" << leftinterval[0] << ", " << leftinterval[1] << "]\n";
 
             //calculate interval of left child node
             this->internalStoRI(&time_adj, &mean_adj, &cov_adj, leftinterval, myNode->left, CompleteTrace); // debug: is 'completetrace' true??
-            // std::cout << "time: " << timeval<<std::endl;
             //update values for "globally/left" side
             if (leftinterval[0] < globint[0]) {
                 globint[0] = leftinterval[0];
@@ -566,8 +521,6 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
             if (leftinterval[1] < globint[1]) {
                 globint[1] = leftinterval[1];
             }
-
-            // std::cout << "globally portion: [" << globint[0] << ", " << globint[1] << "\n";
 
             //calc function of satisfying temporal thingy at that time (right branch)
             if (myNode->leftbound <= (*timevec)[i] && (*timevec)[i] <= myNode->rightbound) { //if the time is in the bounds of the operator
@@ -598,18 +551,11 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
         }
 
         if ((timevec->back() < myNode->rightbound) & !CompleteTrace) { //Report upper bound of one if there was data, but it's not finished yet
-            // std::cout << "time: " << timevec->back() << std::endl;
-            // std::cout << "globint: [" << globint[0] << ", " << globint[1] << "] \n";
-            // std::cout << "rightint: [" << rightinterval[0] << ", " << rightinterval[1] << "] \n";
-            // std::cout << std::endl << std::endl;
-            // std::cout << Interval[1] << std::endl;
-            // std::cout << globint[1] << std::endl;
             if (globint[1] > Interval[1]) {
                 Interval[1] = globint[1];
             }
         }
 
-        // std::cout << "Interval: [" << Interval[0] << ", " << Interval[1] << "] " << std::endl;
     }
 }
 
