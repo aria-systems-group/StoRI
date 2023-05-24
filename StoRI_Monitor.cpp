@@ -36,10 +36,6 @@ void StoRI_Monitor::BuildForm1()
 
   //build specification
   this->myRootNode = this->BuildAST("((!(obstacle))&(workspace))U[4,6](goal)",mymap);
-
-  //optionaly (goofy) heuristic info
-  heuristicInfo.insert(std::pair<int,std::vector<int>>(1,{2}));
-  simpleHeuristicInfo.push_back({3.5,2.5});
 }
 
 void StoRI_Monitor::BuildForm2()
@@ -77,13 +73,6 @@ void StoRI_Monitor::BuildForm2()
 
   //build specification
   this->myRootNode = this->BuildAST("(((workspace)&(!(obstacle)))U[0,10](goal1))&(((workspace)&(!(obstacle)))U[0,10](goal2))",mymap);
-
-  //optionaly (goofy) heuristic info
-  heuristicInfo.insert(std::pair<int,std::vector<int>>(2,{4}));
-  heuristicInfo.insert(std::pair<int,std::vector<int>>(3,{11}));
-
-  simpleHeuristicInfo.push_back({2.5,1.5});
-  simpleHeuristicInfo.push_back({2.5,-1.5});
 }
 
 void StoRI_Monitor::BuildForm3()
@@ -129,10 +118,6 @@ void StoRI_Monitor::BuildForm3()
 
   //build specification
   this->myRootNode = this->BuildAST("((workspace)&(safety))U[0,10](charger)",mymap);
-
-  //optionaly (goofy) heuristic info
-  simpleHeuristicInfo.push_back({2.5,4.5});
-  simpleHeuristicInfo.push_back({0.5,4.5});
 }
 
 ASTNode* StoRI_Monitor::axisAlignedPredicate(int stateDim, int index, bool geq, double Bval)

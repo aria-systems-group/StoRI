@@ -36,10 +36,6 @@ class StoRI_Monitor
         //Attributes
         ASTNode* myRootNode;
 
-        std::map<int,std::vector<int>> heuristicInfo;
-
-        std::vector<std::vector<double>> simpleHeuristicInfo;
-
         //Methods
         void BuildForm1(); //build formula 1 from paper
 
@@ -58,8 +54,4 @@ class StoRI_Monitor
         void internalStoRI(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, ASTNode* myNode, bool CompleteTrace);
 
         void AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, bool CompleteTrace);
-
-        bool isActive(double time, int nodeind);
-
-        ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode> predicates);
 };
