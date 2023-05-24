@@ -524,7 +524,50 @@ int main(int argc, char ** argv)
 
     // evaluateMatlabTrace();
 
-    std::cout << "testing hello?\n";
+    // build predicates
+    std::map<std::string,ASTNode*> mymap;
+
+    PrSTL_Monitor myMonitor; //Initial monitor
+
+    ASTNode* firstNode = new ASTNode(5);
+    firstNode->A = Eigen::Vector4d(1,0,0,0);
+    firstNode->B = 3;
+    mymap["x>3"] = firstNode;
+
+    ASTNode* secondNode = new ASTNode(5);
+    secondNode->A = Eigen::Vector4d(-1,0,0,0);
+    secondNode->B = -4;
+    mymap["x<4"] = secondNode;
+    
+    ASTNode* thirdNode = new ASTNode(5);
+    thirdNode->A = Eigen::Vector4d(0,0,1,0);
+    thirdNode->B = 2;
+    mymap["y>2"] = thirdNode;
+
+    ASTNode* fourthNode = new ASTNode(5);
+    fourthNode->A = Eigen::Vector4d(0,0,-1,0);
+    fourthNode->B = -3;
+    mymap["y<3"] = fourthNode;
+
+    ASTNode* fifthNode = new ASTNode(5);
+    fifthNode->A = Eigen::Vector4d(1,0,0,0);
+    fifthNode->B = 1;
+    mymap["x>1"] = fifthNode;
+
+    ASTNode* sixthNode = new ASTNode(5);
+    sixthNode->A = Eigen::Vector4d(-1,0,0,0);
+    sixthNode->B = -2;
+    mymap["x<2"] = sixthNode;
+
+    //build regions
+    ASTNode* goal = myMonitor.BuildAST("((x>3)&(x<4))&((y>2)&(y<3))",mymap);
+    mymap["goal"] = goal;
+
+    ASTNode* obstacle = myMonitor.BuildAST("((x>1)&(x<2))&((y>2)&(y<3))",mymap);
+    mymap["obstacle"] = obstacle;
+
+    //build specification
+    ASTNode* testformula = myMonitor.BuildAST("(!(obstacle))U[4,6](goal)",mymap);
 
     return 0;
 }

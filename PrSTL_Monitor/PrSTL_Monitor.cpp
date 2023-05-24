@@ -7,6 +7,7 @@
 
 //TODO - something is off by a timestep or two, somewhere (look at online monitoring examples)
 //TODO - replace "buildform" functions by simply doing it live in main
+//TODO - in StoRI calculations, add check if a node has children or not and add errors where helpful
 
 //long term todos:
 // - make parser
@@ -34,7 +35,7 @@ void PrSTL_Monitor::BuildForm4()
   this->myRootNode = new ASTNode(1);
 }
 
-ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
+ASTNode* PrSTL_Monitor::BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
 {
   // TODO
     // - create predicate class
@@ -60,6 +61,13 @@ ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predica
   // if it's a predicate
   if (predicates.count(strFormula)>0) 
   {
+    // std::cout<<"found that it's a predicate\n";
+    // std::cout<<"key: \n";
+    // std::cout<<strFormula<<std::endl;
+    // std::cout<< "address of node that corresponds to this key: \n";
+    // std::cout<< predicates[strFormula] << std::endl;
+    // std::cout<< "B that corresponds to that node: \n";
+    // std::cout<<predicates[strFormula]->B << std::endl;
     return predicates[strFormula]; 
   } 
 
@@ -116,10 +124,11 @@ ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predica
     int index = 0;
     do
     {
-      assert(("Parenthetical mismatch, check parenthesis",index < (strFormula.length()-1))); //if we reach the end of the string (and index is not zero)
+      bool test = (index < (strFormula.length()-1));
+      assert(("Parenthetical mismatch, check parenthesis",index <= (strFormula.length()-1))); //if we reach the end of the string (and index is not zero)
       if (strFormula.at(index)=='(') 
       {
-        myCounter;  
+        myCounter--;  
       }
       else if (strFormula.at(index)==')') {
         myCounter++;
@@ -128,9 +137,9 @@ ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predica
     } while(myCounter != 0);
 
     // if string is empty, remove parenthesis from front and back and feed it to the function again
-    if (index == (strFormula.length()-1))
+    if (index == strFormula.length())
     {
-      return BuildAST(strFormula.substr(1,(strFormula.length()-1)), predicates); 
+      return BuildAST(strFormula.substr(1,(strFormula.length()-2)), predicates); 
     } 
     
     // otherwisre, split into left and right side of symbol using index we kept
@@ -146,6 +155,9 @@ ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predica
       ASTNode* myNode = new ASTNode(1);  
       myNode->left = BuildAST(leftString, predicates); 
       myNode->right = BuildAST(rightString, predicates); 
+
+      //return the node
+      return myNode;
     } 
 
     // else if operator is until

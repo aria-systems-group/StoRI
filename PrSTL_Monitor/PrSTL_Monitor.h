@@ -49,7 +49,7 @@ class PrSTL_Monitor
 
         void BuildForm4(); //build formula 4 from paper
 
-        void BuildAST(std::string strFormula);
+        ASTNode* BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates);
 
         bool HyperplaneCCValidityChecker(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const;
 
