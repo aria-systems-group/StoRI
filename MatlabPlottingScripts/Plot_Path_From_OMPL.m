@@ -4,15 +4,14 @@ close all
 
 global p2 p3
 
-formula = 2;
+formula = 1;
 dt = 0.15;
-% set true to plot covariance ellipses
-plot_error = true;
+plot_error = true; % set true to plot covariance ellipses
 error_bound = 0.9; % percent bound desired for covariance ellipses
 
 % load csv
-path_data = load("control_path.csv");
-interval_data = load("Interval.csv");
+path_data = load("../build/control_path.csv");
+interval_data = load("../build/Interval.csv");
 
 % set initial state (nonlinearized)
 x0lin = path_data(1,1:4)';
@@ -41,11 +40,6 @@ while time1 < finaltime-0.0001
     x0 = local_data(end,:);
     time1 = time1 + dt;
 end
-
-% otherdat = global_data;
-% covdat = load('cov_dat.csv');
-% save('NarrowCov2','covdat')
-% save('Narrow2','otherdat')
 
 % plot
 figure(1)
@@ -90,89 +84,10 @@ if formula == 2
     ax = gca;
     ax.FontSize = 20;
     
-%     set(gca,'xdir','Reverse')
-%     camroll(-90)
-%     
-%     ax = gca;
-%     ax.FontSize = 20;
-%     ax.YAxisLocation = 'Right';
-%     
-%     xlabel('X Position (m)')
-%     ylabel('Y Position (m)')
-    
     formulastr = "Trajectory for \phi_2 with Interval [";
 end
-if formula == 2.1
-    av_x = [1.5,3.5,3.5,1.5,1.5];
-    av_y = [-0.5,-0.5,0.5,0.5,-0.5];
-    
-    go1_x = [2,3,3,2,2];
-    go1_y = [1,1,2,2,1];
-    
-    go2_x = [2,3,3,2,2];
-    go2_y = [-1,-1,-2,-2,-1];
-    
-    wall_x = [0,4,4,0,0];
-    wall_y = [-2,-2,2,2,-2];
-    
-    figure(1)
-    set(gcf,'Position',[200 200 800 700])
-    xlim([0 4])
-    ylim([-2 2])
-    
-    patch(av_x, av_y, 'black', 'FaceColor', 'black', 'FaceAlpha', 0.7);
-    patch(go1_x, go1_y, 'black', 'FaceColor', '#F2DEA2', 'FaceAlpha', 1);
-    patch(go2_x, go2_y, 'black', 'FaceColor', '#F2DEA2', 'FaceAlpha', 1);
-    plot(wall_x,wall_y,'k')
-    
-    ax = gca;
-    ax.FontSize = 20;
-    
-    xlabel('X', 'Interpreter','Latex')
-    ylabel('Y', 'Interpreter','Latex')
-    
-    formulastr = "Trajectory for \phi_4 with" + newline + "interval [";
-    
-    % plot error ellipses
-    if plot_error
-        load('NarrowCov2.mat');
-        data_size = size(covdat);
-        for i = 1:data_size(1)
-            cov4 = buildCov4x4(covdat(i,5:14));%extract 4x4 covariance
-            cov2 = [cov4(1,1),cov4(1,3);cov4(1,3),cov4(3,3)];%extract 2x2 covariance
-            mean = [covdat(i,1),covdat(i,3)];%extract mean
-            plotErrorEllipseAlt(mean, cov2, error_bound);%plot the error ellipse    
-        end
-    end
-    
-    load('Narrow2.mat')
-    
-    p4 = plot(otherdat(:,1),otherdat(:,2),'k--'); % trajectory
 
-    
-end
 if formula == 3
-    av_x = [1,4,4,1,1];
-    av_y = [1,1,3,3,1];
-    
-    go1_x = [0,1,1,0,0];
-    go1_y = [1,1,2,2,1];
-    
-    go2_x = [4,5,5,4,4];
-    go2_y = [0,0,1,1,0];
-    
-    wall_x = [0,5,5,0,0];
-    wall_y = [0,0,3,3,0];
-    
-    patch(av_x, av_y, 'black', 'FaceColor', 'red', 'FaceAlpha', 0.2);
-    patch(go1_x, go1_y, 'black', 'FaceColor', 'green', 'FaceAlpha', 0.7);
-    patch(go2_x, go2_y, 'black', 'FaceColor', 'green', 'FaceAlpha', 0.7);
-    plot(wall_x,wall_y,'r')
-    
-    formulastr = "Trajectory for \phi_3 with Interval [";
-end
-
-if formula == 4
     go_x = [2,3,3,2,2];
     go_y = [4,4,5,5,4];
     
@@ -202,67 +117,13 @@ if formula == 4
     xlabel('X Position (m)')
     ylabel('Y Position (m)')
     
-    formulastr = "Trajectory for \phi_4 with" + newline + "interval [";
-    
-end
-if formula == 4.1
-    go_x = [2,3,3,2,2];
-    go_y = [4,4,5,5,4];
-    
-    pud_x = [0,2.5,2.5,0,0];
-    pud_y = [2,2,3,3,2];
-    
-    carp_x = [0,1,1,0,0];
-    carp_y = [4,4,5,5,4];
-    
-    wall_x = [0,3,3,0,0];
-    wall_y = [0,0,5,5,0];
-    
-    figure(1)
-    set(gcf,'Position',[200 200 800 450])
-    
-    patch(go_x, go_y, 'black', 'FaceColor', '#F2DEA2', 'FaceAlpha', 1);
-    patch(pud_x,pud_y, 'black', 'FaceColor', '#71B1D9', 'FaceAlpha', 1);
-    patch(carp_x,carp_y, 'black', 'FaceColor', 'black', 'FaceAlpha', 0.3);
-    plot(wall_x,wall_y,'k')
-    set(gca,'xdir','Reverse')
-    xlim([0 3])
-    ylim([0 5])
-    camroll(-90)
-    
-    ax = gca;
-    ax.FontSize = 16;
-    ax.YAxisLocation = 'Right';
-    
-    xlabel('Y','Interpreter','Latex')
-    ylabel('X','Interpreter','Latex')
-    
-    formulastr = "Trajectory for \phi_4 with" + newline + "interval [";
-    
-    
-    
-    load('Narrow.mat')
-    
-    % plot error ellipses
-    if plot_error
-        load('NarrowCov.mat');
-        data_size = size(covdat);
-        for i = 1:data_size(1)
-            cov4 = buildCov4x4(covdat(i,5:14));%extract 4x4 covariance
-            cov2 = [cov4(1,1),cov4(1,3);cov4(1,3),cov4(3,3)];%extract 2x2 covariance
-            mean = [covdat(i,1),covdat(i,3)];%extract mean
-            plotErrorEllipseAlt(mean, cov2, error_bound);%plot the error ellipse    
-        end
-    end
-    
-    p4 = plot(otherdat(:,1),otherdat(:,2),'k--','LineWidth',2); % trajectory
-
+    formulastr = "Trajectory for \phi_3 with" + newline + "interval [";
     
 end
 
 % plot error ellipses
 if plot_error
-    covdat = load('cov_dat.csv');
+    covdat = load('../build/cov_dat.csv');
     data_size = size(covdat);
     for i = 1:data_size(1)
         cov4 = buildCov4x4(covdat(i,5:14));%extract 4x4 covariance
@@ -272,70 +133,11 @@ if plot_error
     end
 end
 
-if formula == 4.1 || formula == 2.1
-    p1 = plot(global_data(:,1),global_data(:,2),'k','LineWidth',2); % trajectory
-    
-%     dim = [0.45,0.25,0.135,0.1];
-%     str = 'Puddle';
-%     annotation('textbox',dim,'String',str,'FontSize',20); 
-%     text(0.25,2.2,'Puddle','FontSize',24)
-%     text(0.25,4.2,'Carpet','FontSize',24)
-%     text(2.5,4.25,'Charger','FontSize',24)
+% plot trajectory
+p1 = plot(global_data(:,1),global_data(:,2),'k'); % trajectory
 
-else
-    p1 = plot(global_data(:,1),global_data(:,2),'k'); % trajectory
-    % grid on
-
-    % title(formulastr + num2str(interval_data(1)) + ", " + num2str(interval_data(2)) + "]")
-    axis image
-
-end
-
-
-if formula == 4.1 || formula == 2.1
-    legend([p1 p4],'Trajectory 1','Trajectory 2','FontSize',24,'Location','SouthWest');
-else
-    legend([p1 p2],'Expected Trajectory','90% Confidence Ellipses','Location','SouthWest');
-end
-
-
-
-print('form2','-depsc');
-
-% plot(covdat(:,1),covdat(:,3),'r--'); % delete
-
-% figure(2)
-% subplot(2,1,1)
-% plot(global_time,global_data(:,1))
-% title('X Position vs Time')
-% xlabel('Time (s)')
-% ylabel('X Position (m)')
-% grid on
-% subplot(2,1,2)
-% plot(global_time,global_data(:,2))
-% title('Y Position vs Time')
-% xlabel('Time (s)')
-% ylabel('Y Position (m)')
-% grid on
-
-
-% distance = 0;
-% for i = 2:length(global_time)
-%     dx = global_data(i,1) - global_data(i-1,1);
-%     dy = global_data(i,2) - global_data(i-1,2);
-%     distance = distance + sqrt(dx^2 + dy^2);
-% end
-% distance
-% 
-% distance = 0;
-% for i = 2:data_size(1)
-%     dx = covdat(i,1) - covdat(i-1,1);
-%     dy = covdat(i,3) - covdat(i-1,3);
-%     distance = distance + sqrt(dx^2 + dy^2);
-% end
-% distance
-
-
+title(formulastr + num2str(interval_data(1)) + ", " + num2str(interval_data(2)) + "]")
+axis image
 
 function dx = nonlinearEOM(t,x,ulin)
 %calculate actual nonlinear controls

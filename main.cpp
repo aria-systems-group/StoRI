@@ -1,5 +1,4 @@
 // ROLAND ILYES
-
 #include <memory>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
@@ -21,7 +20,7 @@
 #include <eigen3/Eigen/Dense>
 #include <ompl/base/Path.h>
 #include <vector>
-#include "PrSTL_Monitor.h"
+#include "StoRI_Monitor.h"
 #include <chrono>
 #include "ompl/tools/benchmark/Benchmark.h"
 #include <functional>
@@ -109,7 +108,7 @@ public:
 };
 /// @endcond
 
-void saveAndEvalSolution(oc::SimpleSetup *mySimpleSetup, PrSTL_Monitor *MyMonitor)
+void saveAndEvalSolution(oc::SimpleSetup *mySimpleSetup, StoRI_Monitor *MyMonitor)
 {
     std::ofstream(myfile);
     myfile.open("control_path.csv");
@@ -211,11 +210,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
         bounds.setHigh(2,2);
     }else if (formula == 3) {
         bounds.setLow(0,0); //x position bounds
-        bounds.setHigh(0,5);
-        bounds.setLow(2,0); //y position bounds
-        bounds.setHigh(2,3);
-    }else if (formula == 4) {
-        bounds.setLow(0,0); //x position bounds
         bounds.setHigh(0,3);
         bounds.setLow(2,0); //y position bounds
         bounds.setHigh(2,5);
@@ -265,11 +259,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
         start[2] = 1.5;
         start[3] = 0;
     }else if (formula == 3) {
-        start[0] = 2.5;
-        start[1] = -0.1;
-        start[2] = 2.5;
-        start[3] = 0;
-    }else if (formula == 4) {
         start[0] = 1.5;
         start[1] = 0.5;
         start[2] = 1;
@@ -318,15 +307,13 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
     roplan.setStateDyn(4,2, sysA, sysB); // give state dynamics of system
     roplan.setGoalBias(0.1); //bias for how often to use heuristic
     roplan.setprintsoln(true); //if true, prints final solution's interval to output and CSV
-    PrSTL_Monitor MyMonitor; //Initial monitor
+    StoRI_Monitor MyMonitor; //Initial monitor
     if (formula == 1) {//which (hardcoded) formula to solve for
-        MyMonitor.BuildForm1(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm1(); 
     }else if (formula == 2) {
-        MyMonitor.BuildForm2(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm2(); 
     }else if (formula == 3) {
-        MyMonitor.BuildForm3(&MyMonitor.Mytree); 
-    }else if (formula == 4) {
-        MyMonitor.BuildForm4(&MyMonitor.Mytree); 
+        MyMonitor.BuildForm3(); 
     }
     roplan.optimizeSolution(optimize);
     roplan.setStoRIMonitor(MyMonitor); //give that monitor to the planner
@@ -347,8 +334,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
             str1 = "Formula2";
         }else if (formula == 3) {
             str1 = "Formula3";
-        }else if (formula == 4) {
-            str1 = "Formula4";
         }
 
         if (optimize) {
@@ -384,7 +369,7 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
     }
     
     if (!benchmark) {
-        ob::PlannerStatus solved = ss.solve(300);
+        ob::PlannerStatus solved = ss.solve(60);
 
         if (solved)
         {
@@ -399,102 +384,6 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
             std::cout << "No solution found" << std::endl;
     }
         
-}
-
-void evaluateMatlabTrace()
-{
-    //initialize vectors
-    std::vector<double> timevec;
-    std::vector<Eigen::MatrixXd> meanTrace;
-    std::vector<Eigen::MatrixXd> covtrace;
-    std::vector<double> meanvec;
-    std::vector<double> covvec;
-
-    //load in the data from csv
-    std::ifstream myfile1;
-    std::ofstream myfile;
-    myfile1.open ("/Users/rolandilyes/PrSTL_Monitor/src/build/Matlab_path_data.csv");
-    std::string line;
-    std::string numb;
-
-    int ind_1 = 0;
-    int ind_2 = 0;
-    float test;
-    std::string record;
-    while (std::getline(myfile1, record)){
-        std::istringstream line(record);
-        while (std::getline(line,record, ',')){
-            //first, sort elements to temporary vectors
-            if (ind_2 == 0) { //if first element, save to time vector
-            timevec.push_back(std::stod(record));
-            } else if (ind_2 > 0 & ind_2 < 5) { //next four elements are mean
-            meanvec.push_back(std::stod(record));
-            } else { //rest are covariance
-            covvec.push_back(std::stod(record));
-            }
-
-            //iterate counter
-            ind_2++;
-        }
-
-        //next, add Eigen Matrices to the global traces
-        meanTrace.push_back(Eigen::Vector4d(meanvec[0],meanvec[1],meanvec[2],meanvec[3]));
-        auto cov = new Eigen::Matrix4d;
-        (*cov) << covvec[0], covvec[1], covvec[2], covvec[3],
-                  covvec[1], covvec[4], covvec[5], covvec[6],
-                  covvec[2], covvec[5], covvec[7], covvec[8],
-                  covvec[3], covvec[6], covvec[8], covvec[9];
-        covtrace.push_back((*cov));
-        delete cov;
-
-        //clear temporary vectors
-        meanvec.clear();
-        covvec.clear();
-        
-        ind_2 = 0;
-        ind_1++;
-    }
-
-    myfile1.close();
-
-    //evaluate the trace
-    PrSTL_Monitor MyMonitor;
-    MyMonitor.BuildForm1(&MyMonitor.Mytree);
-    double Interval[2];
-
-    // std::vector<double> temptime;
-    // std::vector<Eigen::MatrixXd> tempmean;
-    // std::vector<Eigen::MatrixXd> tempcov;
-    for (int i = 0; i < timevec.size(); i++) {
-        auto temptime = timevec;
-        temptime.resize(i);
-
-        auto tempmean = meanTrace;
-        tempmean.resize(i);
-
-        auto tempcov = covtrace;
-        tempcov.resize(i);
-
-        // temptime.push_back(timevec[i]);
-        // tempmean.push_back(meanTrace[i]);
-        // tempcov.push_back(covtrace[i]);
-
-        MyMonitor.AriaMetric(&temptime, &tempmean, &tempcov, Interval, 0, false);
-
-        std::cout << "Interval at time " << timevec[i] << ": [" << Interval[0] << ", " << Interval[1] << "] \n";
-
-        temptime.clear();
-        tempmean.clear();
-        tempcov.clear();
-    }
-
-    MyMonitor.AriaMetric(&timevec, &meanTrace, &covtrace, Interval, 0, true);
-
-    std::cout << "\n\n\n FINAL INTERVAL IS: [" << Interval[0] << ", " << Interval[1] << "] " << std::endl;
-
-    myfile.open("Interval.csv");
-    myfile << Interval[0] << ", " << Interval[1] << std::endl;
-    myfile.close();
 }
 
 int main(int argc, char ** argv)
@@ -516,13 +405,7 @@ int main(int argc, char ** argv)
         benchmark = std::stoi(argv[3]);
     }
 
-    // int formula = 1;
-    // bool benchmark = true;
-    // bool optimize = false;
-
     planWithSimpleSetup(formula,benchmark,optimize);
-
-    // evaluateMatlabTrace();
 
     return 0;
 }

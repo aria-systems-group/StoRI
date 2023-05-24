@@ -1,10 +1,10 @@
-add_library(prstl PrSTL_Monitor.cpp)
+add_library(stori StoRI_Monitor.cpp)
 
 find_package(Eigen3 REQUIRED)
 
-target_include_directories(prstl PUBLIC
-${PROJECT_SOURCE_DIR}/PrSTL_Monitor
-${Boost_INCLUDE_DIRS}
+target_include_directories(stori PUBLIC
+  ${PROJECT_SOURCE_DIR}/StoRI_Monitor
+  ${Boost_INCLUDE_DIRS}
 )
 # $ENV{EIGEN3_INCLUDE_DIR}
 # )

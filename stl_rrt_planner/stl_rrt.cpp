@@ -39,7 +39,7 @@
 #include "ompl/tools/config/SelfConfig.h"
 #include <limits>
 #include <iostream>
-#include "PrSTL_Monitor.h"
+#include "StoRI_Monitor.h"
 #include "R2BeliefSpace.h" //todo: remove the need for explicit decalring statespace types in this script
 #include <ompl/base/spaces/TimeStateSpace.h>
 
@@ -170,7 +170,6 @@ ompl::base::PlannerStatus ompl::control::STLRRT::solve(const base::PlannerTermin
         if (rng_.uniform01() <= goalBias_) { // simple heuristic
             //randomly select goal
             int selectedgoal = rng_.uniformInt(0, (MyMonitor_.simpleHeuristicInfo.size()-1)); //randomly pick a "goal"
-            
             rstate->as<ompl::base::CompoundStateSpace::StateType>()->as<R2BeliefSpace::StateType>(0)->values[0] = MyMonitor_.simpleHeuristicInfo[selectedgoal][0];
             rstate->as<ompl::base::CompoundStateSpace::StateType>()->as<R2BeliefSpace::StateType>(0)->values[2] = MyMonitor_.simpleHeuristicInfo[selectedgoal][1];
         } 
@@ -203,7 +202,7 @@ ompl::base::PlannerStatus ompl::control::STLRRT::solve(const base::PlannerTermin
             if (solv)
             {
                 // find interval of solution
-                MyMonitor_.AriaMetric(&motion->Motion_TimeSignal, &motion->Motion_StateSignal, &motion->Motion_CovSignal, resultcontainer_, 0, true); 
+                MyMonitor_.AriaMetric(&motion->Motion_TimeSignal, &motion->Motion_StateSignal, &motion->Motion_CovSignal, resultcontainer_, true); 
 
                 // save as first score if one hasn't been found yet
                 if (FirstScore_ == 0) {
@@ -336,7 +335,7 @@ ompl::base::PlannerStatus ompl::control::STLRRT::solve(const base::PlannerTermin
         //ss.getSolutionPath().printAsMatrix(myfile);
         myfile.close();
 
-        std::cout << "TESTING PATH LENGTH: " << calcPathLength(solution) << std::endl;
+        // std::cout << "TESTING PATH LENGTH: " << calcPathLength(solution) << std::endl;
 
         if (printsoln_) {
             //resultcontainer should containt best solution so far
@@ -373,7 +372,6 @@ void ompl::control::STLRRT::getPlannerData(base::PlannerData &data) const
 
     if (lastGoalMotion_)
         data.addGoalVertex(base::PlannerDataVertex(lastGoalMotion_->state));
-
     for (auto m : motions)
     {
         if (m->parent)
@@ -480,7 +478,7 @@ bool ompl::control::STLRRT::isSignalValid(Motion *candidate, bool isfinished)
 {
     //Define interval, calculate StoRI (partial or complete depending on isfinished)
     double Interval[2];
-    MyMonitor_.AriaMetric(&candidate->Motion_TimeSignal, &candidate->Motion_StateSignal, &candidate->Motion_CovSignal, Interval, 0, isfinished); 
+    MyMonitor_.AriaMetric(&candidate->Motion_TimeSignal, &candidate->Motion_StateSignal, &candidate->Motion_CovSignal, Interval, isfinished); 
 
     if (!isfinished && (Interval[1] > StoRIConstraint_)) {
         //std::cout << "Partial Interval of [" << Interval[0] << ", " << Interval[1] << "] \n";

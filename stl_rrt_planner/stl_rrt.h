@@ -37,7 +37,7 @@
 #ifndef OMPL_CONTROL_PLANNERS_STLRRT_STLRRT_
 #define OMPL_CONTROL_PLANNERS_STLRRT_STLRRT_
 
-#include "PrSTL_Monitor.h"
+#include "StoRI_Monitor.h"
 #include "ompl/control/planners/PlannerIncludes.h"
 #include "ompl/datastructures/NearestNeighbors.h"
 #include "R2BeliefSpace.h"
@@ -91,7 +91,7 @@ namespace ompl
             }
 
             /** \brief Set the StoRI Monitor the planner is using */
-            void setStoRIMonitor(PrSTL_Monitor StoRIMonitor)
+            void setStoRIMonitor(StoRI_Monitor StoRIMonitor)
             {
                 MyMonitor_ = StoRIMonitor;
             }
@@ -269,7 +269,7 @@ namespace ompl
             double StoRIConstraint_{0.7};
 
             /** \brief The Monitor for the Stochastic Robustness Interval */
-            PrSTL_Monitor MyMonitor_;
+            StoRI_Monitor MyMonitor_;
 
             /** \brief The System Dynamics (used for DIS calculations) [THIS ALGO ONLY WORKS FOR LINEAR SYSTEMS]*/
             int StateDyn_N_{0};
