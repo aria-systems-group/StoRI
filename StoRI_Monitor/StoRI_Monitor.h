@@ -30,7 +30,7 @@ class ASTNode {
         }
 };
 
-class PrSTL_Monitor
+class StoRI_Monitor
 {
     public:
         //Attributes

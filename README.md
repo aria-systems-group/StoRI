@@ -7,6 +7,8 @@ The [Stochastic Robustness Interval](https://arxiv.org/abs/2210.04813) (StoRI) i
 
 The code includes a `CMakeLists.txt` for compilation purposes. The code is dependent on the [Open Motion Planning Library](http://ompl.kavrakilab.org) (OMPL) as well as [Eigen3](https://eigen.tuxfamily.org/index.php?title=Main_Page). The repository here contains source code for static libraries for a custom state space, the measure and monitor, and the motion planning algorithm. The repository also contains some MATLAB scripts for plotting and testing the planner/measure. 
 
+The directories also contain their own READMEs with more information. Please refer to the
+
 ### Spaces
 
 The state space implementation is a modified state space based on code from Qi Heng Ho. It allows us to describe a belief of a state in $\mathbb{R}^4$, allowing us to store the mean and covariance. 

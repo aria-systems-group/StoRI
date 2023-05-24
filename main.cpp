@@ -20,7 +20,7 @@
 #include <eigen3/Eigen/Dense>
 #include <ompl/base/Path.h>
 #include <vector>
-#include "PrSTL_Monitor.h"
+#include "StoRI_Monitor.h"
 #include <chrono>
 #include "ompl/tools/benchmark/Benchmark.h"
 #include <functional>
@@ -108,7 +108,7 @@ public:
 };
 /// @endcond
 
-void saveAndEvalSolution(oc::SimpleSetup *mySimpleSetup, PrSTL_Monitor *MyMonitor)
+void saveAndEvalSolution(oc::SimpleSetup *mySimpleSetup, StoRI_Monitor *MyMonitor)
 {
     std::ofstream(myfile);
     myfile.open("control_path.csv");
@@ -307,7 +307,7 @@ void planWithSimpleSetup(int formula, bool benchmark, bool optimize)
     roplan.setStateDyn(4,2, sysA, sysB); // give state dynamics of system
     roplan.setGoalBias(0.1); //bias for how often to use heuristic
     roplan.setprintsoln(true); //if true, prints final solution's interval to output and CSV
-    PrSTL_Monitor MyMonitor; //Initial monitor
+    StoRI_Monitor MyMonitor; //Initial monitor
     if (formula == 1) {//which (hardcoded) formula to solve for
         MyMonitor.BuildForm1(); 
     }else if (formula == 2) {

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ostream>
 #include <vector>
-#include "PrSTL_Monitor.h"
+#include "StoRI_Monitor.h"
 #include <map>
 #include <cassert>
 
@@ -9,7 +9,7 @@
 // TODO - in StoRI calculations, add check if a node has children or not and add errors where helpful
 // TODO - make parser return an error for "non-binarized" data
 
-void PrSTL_Monitor::BuildForm1()
+void StoRI_Monitor::BuildForm1()
 {
   // initialize predicate dict
   std::map<std::string,
@@ -42,7 +42,7 @@ void PrSTL_Monitor::BuildForm1()
   simpleHeuristicInfo.push_back({3.5,2.5});
 }
 
-void PrSTL_Monitor::BuildForm2()
+void StoRI_Monitor::BuildForm2()
 {
   // initialize predicate dict
   std::map<std::string,
@@ -86,7 +86,7 @@ void PrSTL_Monitor::BuildForm2()
   simpleHeuristicInfo.push_back({2.5,-1.5});
 }
 
-void PrSTL_Monitor::BuildForm3()
+void StoRI_Monitor::BuildForm3()
 {
   // initialize predicate dict
   std::map<std::string,
@@ -135,7 +135,7 @@ void PrSTL_Monitor::BuildForm3()
   simpleHeuristicInfo.push_back({0.5,4.5});
 }
 
-ASTNode* PrSTL_Monitor::axisAlignedPredicate(int stateDim, int index, bool geq, double Bval)
+ASTNode* StoRI_Monitor::axisAlignedPredicate(int stateDim, int index, bool geq, double Bval)
 {
   //stateDim = dimension of state
   //index = index (zero-based) of state of interest
@@ -153,7 +153,7 @@ ASTNode* PrSTL_Monitor::axisAlignedPredicate(int stateDim, int index, bool geq, 
   return myNode;
 }
 
-ASTNode* PrSTL_Monitor::BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
+ASTNode* StoRI_Monitor::BuildAST(std::string strFormula, std::map<std::string,ASTNode*> predicates)
 {
   // REQUIREMENTS/RESTRINCTIONS
   // - Gaussianity, of course
@@ -302,7 +302,7 @@ ASTNode* PrSTL_Monitor::BuildAST(std::string strFormula, std::map<std::string,AS
   }
 }
 
-bool PrSTL_Monitor::HyperplaneCCValidityChecker(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const 
+bool StoRI_Monitor::HyperplaneCCValidityChecker(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const 
 {
     //Adapted from Eric Pairet (Blackmore)
     //IN:
@@ -331,7 +331,7 @@ bool PrSTL_Monitor::HyperplaneCCValidityChecker(const Eigen::MatrixXd &A, const 
 	return valid;
 }
 
-double PrSTL_Monitor::HyperplaneProbabilityFinder(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const 
+double StoRI_Monitor::HyperplaneProbabilityFinder(const Eigen::MatrixXd &A, const double &B, const Eigen::MatrixXd &X, const Eigen::MatrixXd &PX) const 
 {
     //IN:
     //      A and B represent Linear Hyperplane (want Ax < B or Ax-b < 0 to "be valid")
@@ -359,7 +359,7 @@ double PrSTL_Monitor::HyperplaneProbabilityFinder(const Eigen::MatrixXd &A, cons
     return (1 - delta); //P(satisfaction) = 1 - P(violation) 
 }
 
-void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, ASTNode* myNode, bool CompleteTrace)
+void StoRI_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, ASTNode* myNode, bool CompleteTrace)
 {
     if (myNode->nodetype==4) { //"True" Node
         Interval[0]= 1;
@@ -559,7 +559,7 @@ void PrSTL_Monitor::internalStoRI(std::vector<double> *timevec, std::vector<Eige
     }
 }
 
-void PrSTL_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, bool CompleteTrace)
+void StoRI_Monitor::AriaMetric(std::vector<double> *timevec, std::vector<Eigen::MatrixXd> *meanTrace, std::vector<Eigen::MatrixXd> *covtrace, double *Interval, bool CompleteTrace)
 {
   this->internalStoRI(timevec,meanTrace,covtrace,Interval,this->myRootNode, CompleteTrace); 
 }

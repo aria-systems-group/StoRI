@@ -17,7 +17,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # add my libraries (extra functions)
 add_subdirectory(stl_rrt_planner)
-add_subdirectory(PrSTL_Monitor)
+add_subdirectory(StoRI_Monitor)
 add_subdirectory(Spaces)
 
 # add the executable
@@ -28,7 +28,7 @@ target_include_directories(STL_RRT PRIVATE
 ${OMPL_INCLUDE_DIRS} 
 ${Boost_INCLUDE_DIRS}
 ${PROJECT_SOURCE_DIR}/stl_rrt_planner
-${PROJECT_SOURCE_DIR}/PrSTL_Monitor
+${PROJECT_SOURCE_DIR}/StoRI_Monitor
 ${PROJECT_SOURCE_DIR}/Spaces
 )
 
@@ -37,6 +37,6 @@ target_link_libraries(STL_RRT
 ${OMPL_LIBRARIES}
 Eigen3::Eigen
 stlrrt
-prstl
+stori
 matState
 )

@@ -4,7 +4,7 @@ close all
 
 global p2 p3
 
-formula = 3;
+formula = 1;
 dt = 0.15;
 plot_error = true; % set true to plot covariance ellipses
 error_bound = 0.9; % percent bound desired for covariance ellipses
