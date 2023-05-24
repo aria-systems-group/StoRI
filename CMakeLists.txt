@@ -1,42 +1,17 @@
-cmake_minimum_required(VERSION 3.0)
+add_library(stori StoRI_Monitor.cpp)
 
-# set the project name
-project(STL_RRT VERSION 1.0)
-
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
-# find my packages hopefully
-find_package(ompl REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(Boost REQUIRED)
 
-# specify the C++ standard
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_BUILD_TYPE Debug)
-
-# add my libraries (extra functions)
-add_subdirectory(stl_rrt_planner)
-add_subdirectory(StoRI_Monitor)
-add_subdirectory(Spaces)
-
-# add the executable
-add_executable(STL_RRT main.cpp) 
-
-# add directories to list of paths to search for include filesa
-target_include_directories(STL_RRT PRIVATE
-${OMPL_INCLUDE_DIRS} 
-${Boost_INCLUDE_DIRS}
-${PROJECT_SOURCE_DIR}/stl_rrt_planner
-${PROJECT_SOURCE_DIR}/StoRI_Monitor
-${PROJECT_SOURCE_DIR}/Spaces
+target_include_directories(stori PUBLIC
+  ${PROJECT_SOURCE_DIR}/StoRI_Monitor
+  ${Boost_INCLUDE_DIRS}
 )
+# $ENV{EIGEN3_INCLUDE_DIR}
+# )
 
-# link the libraries
-target_link_libraries(STL_RRT
-${OMPL_LIBRARIES}
-Eigen3::Eigen
-stlrrt
-stori
-matState
-)
+# target_link_libraries(prstl
+# Eigen3::Eigen
+# )
+# target_link_libraries(stlsst
+#    ${OMPL_LIBRARIES}
+# )
