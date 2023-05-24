@@ -91,4 +91,19 @@ Then, the portion $\text{Puddle}\rightarrow(\lnot \text{Charger}U_{[0,3]}\text{C
 Finally, this lets the user write the formula as $\text{safety}U_{[0,10]}\text{Charger}$:
 > myMonitor.myRootNode = myMonitor.BuildAST("((workspace)&(safety))U[0,10](charger)",mymap);
 
-This formula is provided in the source code using function `BuildForm3()`
+Notice above that the actual predicate is set to the attribute of the monitor `myRootNode`. This is the node the monitor will look at when evaluating the StoRI
+
+This formula is provided in the source code using function `myMonitor.BuildForm3()`
+
+#### Evaluating the StoRI
+Once the formula is defined, the StoRI or StoRI Monitor can be evaluated by calling:
+> myMonitor.AriaMetric(timeSignal, stateSignal, covSignal, intervalContainer, isTraceComplete);
+
+Here, 
+- timeSignal is a $m\times 1$ std::vector<double> of the real time values of the data
+- stateSignal is a $m\times n$ std::vector<Eigen::MatrixXd> of the state values of the data
+- covSignal is a $m\times (n \times n)$ std::vector<Eigen::MatrixXd> of the covariance values of the data (again, implementation assumes gaussian uncertainty)
+- intervalContainer is a pointer to a 2 element array that the function will use to store the value of the interval
+- isTracePartial is a boolean that
+  - if true, will tell the function to evaluate the StoRI
+  - if false, will tell the function to evaluate the StoRI Monitor
