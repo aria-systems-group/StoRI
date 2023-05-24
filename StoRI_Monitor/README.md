@@ -11,7 +11,7 @@ This, in plain english, reads *puddle means you must stay away from charger unti
 $$Ax > B,$$
 where $A$ is a $1 \times n$ vector, $x$ is your $n \times 1$ state, and $B$ is some real scalar. 
 
-#### Predicates
+### Predicates
 To stay general, this implementation does not assume a dimensionality of your state space, and so the user must define this. Consider the predicate: 
 $$2x + 3y > 4$$
 $$[2 \quad 3][x \quad y]^T > 4$$
@@ -42,7 +42,7 @@ mymap["x>2"] = myNode;
 
 where the inputs to `axisAlignedPredicate` in order are state dimension, index of state of interest, whether the operator is > or >= (as opposed to < or <= which would be "false"), and the value of B in the equations above
 
-#### Formulas
+### Formulas
 With predicates defined, the rest of the formula can be defined as a string
 - **no disjunctions or implications**
   - $A \lor B = \lnot(\lnot A \land \lnot B)$
@@ -95,7 +95,7 @@ Notice above that the actual predicate is set to the attribute of the monitor `m
 
 This formula is provided in the source code using function `myMonitor.BuildForm3()`
 
-#### Evaluating the StoRI
+### Evaluating the StoRI
 Once the formula is defined, the StoRI or StoRI Monitor can be evaluated by calling:
 > myMonitor.AriaMetric(timeSignal, stateSignal, covSignal, intervalContainer, isTraceComplete);
 

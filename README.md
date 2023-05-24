@@ -7,7 +7,7 @@ The [Stochastic Robustness Interval](https://arxiv.org/abs/2210.04813) (StoRI) i
 
 The code includes a `CMakeLists.txt` for compilation purposes. The code is dependent on the [Open Motion Planning Library](http://ompl.kavrakilab.org) (OMPL) as well as [Eigen3](https://eigen.tuxfamily.org/index.php?title=Main_Page). The repository here contains source code for static libraries for a custom state space, the measure and monitor, and the motion planning algorithm. The repository also contains some MATLAB scripts for plotting and testing the planner/measure. 
 
-The directories also contain their own READMEs with more information. Please refer to the StoRI_Monitor directory specifically as **the measure and monitor can be used as a standalone tool**
+The directories also contain their own READMEs with more information. Please refer to the StoRI_Monitor directory specifically as **the measure and monitor can be used as a standalone tool**. Furthermore, the branch "StoRI-light" provides only the implementation of the monitor and measure, without the motion planning algorithm. The branch "original-src" contains the original, unmodified source code used for the paper.
 
 
 ### Main Script
